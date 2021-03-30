@@ -1,0 +1,1 @@
+@ python test.py && gcc -Wall -Wextra example.c && a.exe

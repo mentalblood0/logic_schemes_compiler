@@ -1,0 +1,16 @@
+[
+	{
+		"name": "xor",
+		"wires": [
+			{"from": "INPUT(1)", "to": "NOT_1"},
+			{"from": "INPUT(2)", "to": "NOT_2"},
+			{"from": "INPUT(1)", "to": "OR_2"},
+			{"from": "INPUT(2)", "to": "OR_2"},
+			{"from": "NOT_1", "to": "OR_1"},
+			{"from": "NOT_2", "to": "OR_1"},
+			{"from": "OR_1", "to": "AND_1"},
+			{"from": "OR_2", "to": "AND_1"},
+			{"from": "AND_1", "to": "OUTPUT_1"}
+		]
+	}
+]
