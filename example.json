@@ -22,7 +22,8 @@
 			{"from": "INPUT_2", "to": "xor_2[2]"},
 			{"from": "xor_1", "to": "xor_3[1]"},
 			{"from": "xor_2", "to": "xor_3[2]"},
-			{"from": "xor_3", "to": "OUTPUT_1"}
+			{"from": "xor_3", "to": "OUTPUT_1"},
+			{"from": "xor_3", "to": "OUTPUT_2"}
 		]
 	}
 ]

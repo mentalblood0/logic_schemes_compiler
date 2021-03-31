@@ -1,1 +1,1 @@
-@ python test.py && gcc -Wall -Wextra example.c && a.exe
+@ python test.py && gcc -E example.c > e.txt && gcc -Wall -Wextra example.c && a.exe

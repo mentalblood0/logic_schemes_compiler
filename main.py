@@ -32,14 +32,16 @@ def defineFunction(description):
 			', '.join([(f'{macros_prefix}{i}({inputs_string})') if (i.split('_')[-2] != f'INPUT') else f'{macros_prefix}{i}' for i in elements_inputs[e].values()])
 		)
 	
-	result += '#define %s(%s) %s(%s)' % (
+	result += '#define %s(%s) %s' % (
 		description['name'],
 		inputs_string,
-		', '.join([f'{macros_prefix}OUTPUT_{n}' for n in range(1, outputs_number+1)]),
-		inputs_string
+		', '.join([f'{macros_prefix}OUTPUT_{n}({inputs_string})' for n in range(1, outputs_number+1)])
 	)
+
+	# result += '\n'
+	# result += '\n'.join([f'#undef {macros_prefix}{e}' for e in elements_inputs.keys()])
 	
-	return result
+	return result, outputs_number
 
 def compile(file_path):
 	result = '''#include <stdio.h>
@@ -54,7 +56,24 @@ def compile(file_path):
 	program = None
 	with open('example.json', 'r') as f:
 		program = json.load(f)
-	result += '\n\n'.join([defineFunction(description) for description in program])
+
+	max_outputs_number = 1
+	definitions = ''
+	for description in program:
+		definition, outputs_number = defineFunction(description)
+		definitions += '\n\n' + definition
+		max_outputs_number = max(max_outputs_number, outputs_number)
+
+	result += '''
+#define FIRST(A, ...) A
+#define REST(A, ...) __VA_ARGS__
+
+#define NTH_0(...) FIRST(__VA_ARGS__)
+'''
+	for i in range(1, max_outputs_number):
+		result += f'#define NTH_{i}(...) NTH_{i-1}(REST(__VA_ARGS__))\n'
+
+	result += definitions
 
 	result += '''
 
