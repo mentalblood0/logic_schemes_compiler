@@ -10,7 +10,14 @@
 			{"from": "NOT_2", "to": "OR_1[2]"},
 			{"from": "OR_1", "to": "AND_1[1]"},
 			{"from": "OR_2", "to": "AND_1[2]"},
-			{"from": "AND_1", "to": "OUTPUT_1"}
+			{"from": "AND_1", "to": "OUTPUT_1"},
+			{"from": "AND_1", "to": "OUTPUT_2"}
+		],
+		"tests": [
+			{"inputs": [0, 0], "outputs": [0, 0]},
+			{"inputs": [1, 0], "outputs": [1, 1]},
+			{"inputs": [0, 1], "outputs": [1, 1]},
+			{"inputs": [1, 1], "outputs": [0, 0]}
 		]
 	},
 	{
@@ -20,10 +27,15 @@
 			{"from": "INPUT_2", "to": "xor_1[2]"},
 			{"from": "INPUT_1", "to": "xor_2[1]"},
 			{"from": "INPUT_2", "to": "xor_2[2]"},
-			{"from": "xor_1", "to": "xor_3[1]"},
-			{"from": "xor_2", "to": "xor_3[2]"},
-			{"from": "xor_3", "to": "OUTPUT_1"},
-			{"from": "xor_3", "to": "OUTPUT_2"}
+			{"from": "xor_1[1]", "to": "xor_3[1]"},
+			{"from": "xor_2[1]", "to": "xor_3[2]"},
+			{"from": "xor_3[1]", "to": "OUTPUT_1"}
+		],
+		"tests": [
+			{"inputs": [0, 0], "outputs": [0]},
+			{"inputs": [1, 0], "outputs": [0]},
+			{"inputs": [0, 1], "outputs": [0]},
+			{"inputs": [1, 1], "outputs": [0]}
 		]
 	}
 ]
