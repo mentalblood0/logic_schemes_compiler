@@ -2,22 +2,30 @@ import json
 
 standard_elements = ['NOT', 'AND', 'OR', 'INPUT', 'OUTPUT']
 
-def defineFunction(description):
-	result = ''
-
-	unique_elements = {}
-	elements_inputs = {}
+def getUniqueElements(description):
+	result = {}
 	for w in description['wires']:
-		unique_elements[w['from']] = None
-		unique_elements[w['to']] = None
+		result[w['from']] = None
+		result[w['to']] = None
+	return result
+
+def getElementsInputs(description):
+	result = {}
+	for w in description['wires']:
 		element = w['to'].split('[')[0]
-		if not (element in elements_inputs):
-			elements_inputs[element] = {}
+		if not (element in result):
+			result[element] = {}
 		input_index = w['to'][:-1].split('[')[-1]
 		try:
-			elements_inputs[element][int(input_index)] = w['from']
+			result[element][int(input_index)] = w['from']
 		except ValueError:
-			elements_inputs[element][0] = w['from']
+			result[element][0] = w['from']
+	return result
+
+def defineFunction(description):
+	result = ''
+	unique_elements = getUniqueElements(description)
+	inputs_by_element = getElementsInputs(description)
 
 	inputs_number = len(list(filter(lambda e: e.split('_')[0] == 'INPUT', unique_elements)))
 	outputs_number = len(list(filter(lambda e: e.split('_')[0] == 'OUTPUT', unique_elements)))
@@ -25,9 +33,9 @@ def defineFunction(description):
 	macros_prefix = '__' + description['name'] + '__'
 	inputs_string = ', '.join([f'{macros_prefix}INPUT_{n}' for n in range(1, inputs_number+1)])
 	
-	for e in elements_inputs.keys():
+	for e in inputs_by_element.keys():
 		arguments_list = []
-		for i in elements_inputs[e].values():
+		for i in inputs_by_element[e].values():
 			if i.split('_')[-2] == 'INPUT':
 				arguments_list.append(f'{macros_prefix}{i}')
 			elif '[' in i:
@@ -40,11 +48,11 @@ def defineFunction(description):
 		arguments = ', '.join(arguments_list)
 		result += f"#define {macros_prefix}{e}({inputs_string}) {e.split('_')[0]}({arguments})\n"
 	
-	result += '#define %s(%s) %s' % (
-		description['name'],
-		inputs_string,
-		', '.join([f'{macros_prefix}OUTPUT_{n}({inputs_string})' for n in range(1, outputs_number+1)])
-	)
+	function_outputs_string = ', '.join([
+		f'{macros_prefix}OUTPUT_{n}({inputs_string})'
+		for n in range(1, outputs_number+1)
+	])
+	result += f"#define {description['name']}({inputs_string}) {function_outputs_string}"
 	
 	return result, outputs_number
 
@@ -58,6 +66,43 @@ def defineTestFunction(description):
 	equalities = ' && '.join(equalities_list)
 	result = f"#define test_{description['name']} ({equalities})"
 	return result
+
+def checkNoCycles(current_from, from_to, stack=[]):
+	if current_from in stack:
+		return False, stack + [current_from]
+
+	if not (current_from in from_to):
+		return True, None
+
+	for _to in from_to[current_from]:
+		c = checkNoCycles(_to, from_to, stack = stack + [current_from])
+		if not c[0]:
+			return False, c[1]
+
+	return True, None
+
+def checkFunctionNoCycles(description):
+	from_to = {}
+	for w in description['wires']:
+		from_element = w['from'].split('[')[0]
+		to_element = w['to'].split('[')[0]
+		if not from_element in from_to:
+			from_to[from_element] = []
+		from_to[from_element].append(to_element)
+	
+	for initial_from in from_to.keys():
+		c = checkNoCycles(initial_from, from_to)
+		if not c[0]:
+			return False, c[1]
+
+	return True, None
+
+def checkFunction(description, checks=[checkFunctionNoCycles]):
+	for c in checks:
+		c_result = c(description)
+		if not c_result[0]:
+			return False, {c.__name__: c_result[1]}
+	return True, None
 
 def compile(file_path):
 	result = '''#include <stdio.h>
@@ -75,6 +120,9 @@ def compile(file_path):
 	outputs_numbers = {}
 	definitions = ''
 	for description in program:
+		check_result = checkFunction(description)
+		if not check_result[0]:
+			raise Exception(f'Function "{description["name"]}" not correct: {check_result[1]}')
 		definition, outputs_number = defineFunction(description)
 		test_function_definition = defineTestFunction(description)
 		definitions += '\n\n' + definition + '\n' + test_function_definition
@@ -90,13 +138,17 @@ def compile(file_path):
 		result += f'#define NTH_{i}(...) NTH_{i-1}(REST(__VA_ARGS__))\n'
 
 	result += definitions
+	result += '\n'
+	result += '\n'
+	result += f"""#define test__all {' && '.join([f'test_{d["name"]}' for d in program])}"""
 
-	result += '''
-
-int main(void) {
-	printf("%d\\n", test_xor);
-	printf("%d\\n", test_xorxor);
-	return 0;
-}'''
+	result += '\n'
+	result += '\n'
+	result += 'int main(void) {\n'
+	result += '\tprintf("tests:\\n");\n'
+	result += ''.join([f'\tprintf("\\t{d["name"]}: %s\\n", test_{d["name"]} ? "passed" : "failed");\n' for d in program])
+	result += '\tprintf("%s\\n", test__all ? "All tests passed" : "Some tests not OK");\n'
+	result += '\treturn 0;\n'
+	result += '}'
 
 	return result

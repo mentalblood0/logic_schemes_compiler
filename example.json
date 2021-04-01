@@ -10,6 +10,11 @@
 			{"from": "NOT_2", "to": "OR_1[2]"},
 			{"from": "OR_1", "to": "AND_1[1]"},
 			{"from": "OR_2", "to": "AND_1[2]"},
+
+			{"from": "INPUT_1", "to": "OR_3[1]"},
+			{"from": "OR_3", "to": "NOT_3"},
+			{"from": "NOT_3", "to": "OR_3[2]"},
+
 			{"from": "AND_1", "to": "OUTPUT_1"},
 			{"from": "AND_1", "to": "OUTPUT_2"}
 		],

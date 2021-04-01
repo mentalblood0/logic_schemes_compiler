@@ -30,8 +30,12 @@
 #define xorxor(__xorxor__INPUT_1, __xorxor__INPUT_2) __xorxor__OUTPUT_1(__xorxor__INPUT_1, __xorxor__INPUT_2)
 #define test_xorxor ((NTH_0(xorxor(0, 0)) == 0) && (NTH_0(xorxor(1, 0)) == 0) && (NTH_0(xorxor(0, 1)) == 0) && (NTH_0(xorxor(1, 1)) == 0))
 
+#define test__all test_xor && test_xorxor
+
 int main(void) {
-	printf("%d\n", test_xor);
-	printf("%d\n", test_xorxor);
+	printf("tests:\n");
+	printf("\txor: %s\n", test_xor ? "passed" : "failed");
+	printf("\txorxor: %s\n", test_xorxor ? "passed" : "failed");
+	printf("%s\n", test__all ? "All tests passed" : "Some tests not OK");
 	return 0;
 }
