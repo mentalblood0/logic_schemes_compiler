@@ -1,20 +1,20 @@
-# LSC —  Logic Scheme to C compiler
+# 📦 LSC —  Logic Scheme to C compiler
 
 ## Features
 
 ### Ordinary part
 
-- Written in Python
-- Takes JSON logic schemes representations
-- Checks JSON representation for errors
-- Requires only wires "from, to" description
-- Works with nested schemes (i.e defined scheme can be used in other schemes in file as element)
-- Scheme tests can be provided
+- Written in Python 🐍
+- Takes JSON logic schemes representations 👀
+- Checks JSON representation for errors ✔️
+- Requires only wires "from, to" description ➡️
+- Works with nested schemes (i.e defined scheme can be used in other schemes in file as element) 📁
+- Scheme tests can be provided 🧐
 
 ### Unique part
 
-- Compiles JSON representation to C file using **only macros**
-- Tests compiled using only macros, too
+- Compiles JSON representation to C file using **only macros** 🤓
+- Tests compiled using only macros, too 😎
 
 ## Examples
 
@@ -44,7 +44,7 @@
 }
 ```
 
-output code: [godbolt](https://godbolt.org/z/do3hc675e)
+output code: [godbolt 📜](https://godbolt.org/z/do3hc675e) 
 
 ### XOR of XORs
 
@@ -89,18 +89,18 @@ output code: [godbolt](https://godbolt.org/z/do3hc675e)
 }
 ```
 
-output code: [godbolt](https://godbolt.org/z/WT9Pq9qP5)
+output code: [godbolt 📜](https://godbolt.org/z/WT9Pq9qP5) 
 
 ## Benefits
 
-- Super-easy to integrate with any logic schemes editor
-- Results in macros, so C compiler can easily optimize them
-- Supports nesting
+- Super-easy to integrate with any logic schemes editor 🔌
+- Results in macros, so C compiler can easily optimize them 🎯
+- Supports nesting 📁
 
 ## So
 
 You can
 
-- Rapidly develop complex schemes
-- While keeping calculation speed high
-- Without worrying about optimization 
+- Rapidly develop complex schemes 💪
+- While keeping calculation speed high 🚀
+- Without worrying about optimization 😇
