@@ -14,10 +14,6 @@ def getElementType(element):
 def getElementName(element_input_or_output):
 	return element_input_or_output.split('[')[0]
 
-def getElementInputOutputId(element_input_or_output):
-	str_inside_brackets = element_input_or_output[:-1].split('[')[-1]
-	return 0 if str_inside_brackets == '' else int(str_inside_brackets)
-
 def getElementsNumbers(description):
 	result = {}
 	for e in sum([[w['from'], w['to']] for w in description['wires']], []):
@@ -61,7 +57,7 @@ def getElementsInputs(description):
 		try:
 			result[element][int(input_index)] = w['from']
 		except ValueError:
-			result[element][0] = w['from']
+			result[element][1] = w['from']
 	return result
 
 
@@ -94,7 +90,7 @@ def defineFunction(name, description):
 	
 	function_outputs_string = ', '.join([
 		f'{macros_prefix}OUTPUT_{n}({inputs_string})'
-		for n in range(1, outputs_number+1)
+		for n in range(1, outputs_number + 1)
 	])
 	result += f"#define {name}({inputs_string}) {function_outputs_string}"
 	
@@ -106,7 +102,7 @@ def defineTestFunction(name, description):
 		inputs_string = ', '.join(map(str, t['inputs']))
 		for output_index in range(len(t['outputs'])):
 			output = t['outputs'][output_index]
-			equalities_list.append(f"(NTH_{output_index}({name}({inputs_string})) == {output})")
+			equalities_list.append(f"(NTH_{output_index + 1}({name}({inputs_string})) == {output})")
 	equalities = ' && '.join(equalities_list)
 	result = f"#define test_{name} ({equalities})"
 	return result
@@ -167,6 +163,12 @@ def checkProgramInputsOutputs(program):
 	non_standard_elements_types_inputs_outputs = {}
 	for name, description in program.items():
 		inputs_outputs_for_type = getInputsOutputsNumbersForType(description)
+		for t in description['tests']:
+			for key in ['inputs', 'outputs']:
+				have = len(t[key])
+				should_have = inputs_outputs_for_type[key]
+				if have != should_have:
+					return False, f'Function {name}: Test {t}: {key} number does not match: have {have}, should have {should_have}'
 		if inputs_outputs_for_type['inputs'] == 0:
 			return False, f'Function {name}: 0 inputs'
 		if inputs_outputs_for_type['outputs'] == 0:
@@ -231,11 +233,11 @@ def compile(file_path):
 	result += '#define FIRST(A, ...) A\n'
 	result += '#define REST(A, ...) __VA_ARGS__\n'
 	result += '\n'
-	result += '#define NTH_0(...) FIRST(__VA_ARGS__)\n'
+	result += '#define NTH_1(...) FIRST(__VA_ARGS__)\n'
 	result += '\n'
 
 	for i in range(1, max(outputs_numbers.values())):
-		result += f'#define NTH_{i}(...) NTH_{i-1}(REST(__VA_ARGS__))\n'
+		result += f'#define NTH_{i + 1}(...) NTH_{i}(REST(__VA_ARGS__))\n'
 
 	result += definitions
 	result += '\n'
@@ -247,7 +249,7 @@ def compile(file_path):
 	result += 'int main(void) {\n'
 	result += '\tprintf("tests:\\n");\n'
 	result += ''.join([f'\tprintf("\\t{name}: %s\\n", test_{name} ? "passed" : "failed");\n' for name in program.keys()])
-	result += '\tprintf("%s\\n", test__all ? "All tests passed" : "Some tests not OK");\n'
+	result += '\tprintf("%s\\n", test__all ? "All tests passed" : "Some tests failed");\n'
 	result += '\treturn 0;\n'
 	result += '}'
 
