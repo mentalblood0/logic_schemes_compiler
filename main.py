@@ -1,12 +1,54 @@
 import json
 
-standard_elements = ['NOT', 'AND', 'OR', 'INPUT', 'OUTPUT']
+standard_elements_types_inputs_outputs = {
+	'NOT': 		{'inputs': 1, 'outputs': 1},
+	'AND': 		{'inputs': 2, 'outputs': 1},
+	'OR': 		{'inputs': 2, 'outputs': 1},
+	'INPUT': 	{'inputs': 0, 'outputs': 1},
+	'OUTPUT': 	{'inputs': 1, 'outputs': 0}
+}
 
-def getUniqueElements(description):
+def getElementType(element):
+	return element.split('_')[0]
+
+def getElementName(element_input_or_output):
+	return element_input_or_output.split('[')[0]
+
+def getElementInputOutputId(element_input_or_output):
+	str_inside_brackets = element_input_or_output[:-1].split('[')[-1]
+	return 0 if str_inside_brackets == '' else int(str_inside_brackets)
+
+def getElementsNumbers(description):
+	result = {}
+	for e in sum([[w['from'], w['to']] for w in description['wires']], []):
+		element_name = getElementName(e)
+		element_type = getElementType(e)
+		if not element_type in result:
+			result[element_type] = {}
+		result[element_type][element_name] = None
+	result = {key: len(value.keys()) for key, value in result.items()}
+	return result
+
+def getInputsOutputsNumbersForType(description):
+	elements_numbers = getElementsNumbers(description)
+	return {
+		'inputs': 0 if not ('INPUT' in elements_numbers) else elements_numbers['INPUT'],
+		'outputs': 0 if not ('OUTPUT' in elements_numbers) else elements_numbers['OUTPUT']
+	}
+
+def getInputsOutputsNumbersForInnerElements(description):
 	result = {}
 	for w in description['wires']:
-		result[w['from']] = None
-		result[w['to']] = None
+		
+		from_element = getElementName(w['from'])
+		if not from_element in result:
+			result[from_element] = {'inputs': 0, 'outputs': 0}
+		result[from_element]['outputs'] += 1
+		
+		to_element = getElementName(w['to'])
+		if not to_element in result:
+			result[to_element] = {'inputs': 0, 'outputs': 0}
+		result[to_element]['inputs'] += 1
 	return result
 
 def getElementsInputs(description):
@@ -22,15 +64,17 @@ def getElementsInputs(description):
 			result[element][0] = w['from']
 	return result
 
-def defineFunction(description):
+
+
+def defineFunction(name, description):
 	result = ''
-	unique_elements = getUniqueElements(description)
 	inputs_by_element = getElementsInputs(description)
 
-	inputs_number = len(list(filter(lambda e: e.split('_')[0] == 'INPUT', unique_elements)))
-	outputs_number = len(list(filter(lambda e: e.split('_')[0] == 'OUTPUT', unique_elements)))
+	elements_numbers = getElementsNumbers(description)
+	inputs_number = elements_numbers['INPUT']
+	outputs_number = elements_numbers['OUTPUT']
 
-	macros_prefix = '__' + description['name'] + '__'
+	macros_prefix = '__' + name + '__'
 	inputs_string = ', '.join([f'{macros_prefix}INPUT_{n}' for n in range(1, inputs_number+1)])
 	
 	for e in inputs_by_element.keys():
@@ -52,24 +96,26 @@ def defineFunction(description):
 		f'{macros_prefix}OUTPUT_{n}({inputs_string})'
 		for n in range(1, outputs_number+1)
 	])
-	result += f"#define {description['name']}({inputs_string}) {function_outputs_string}"
+	result += f"#define {name}({inputs_string}) {function_outputs_string}"
 	
 	return result, outputs_number
 
-def defineTestFunction(description):
+def defineTestFunction(name, description):
 	equalities_list = []
 	for t in description['tests']:
 		inputs_string = ', '.join(map(str, t['inputs']))
 		for output_index in range(len(t['outputs'])):
 			output = t['outputs'][output_index]
-			equalities_list.append(f"(NTH_{output_index}({description['name']}({inputs_string})) == {output})")
+			equalities_list.append(f"(NTH_{output_index}({name}({inputs_string})) == {output})")
 	equalities = ' && '.join(equalities_list)
-	result = f"#define test_{description['name']} ({equalities})"
+	result = f"#define test_{name} ({equalities})"
 	return result
+
+
 
 def checkNoCycles(current_from, from_to, stack=[]):
 	if current_from in stack:
-		return False, stack + [current_from]
+		return False, f'Cycle: {stack + [current_from]}'
 
 	if not (current_from in from_to):
 		return True, None
@@ -90,7 +136,8 @@ def checkFunctionNoCycles(description):
 			from_to[from_element] = []
 		from_to[from_element].append(to_element)
 	
-	for initial_from in from_to.keys():
+	inputs = [e for e in from_to if e.split('_')[0] == 'INPUT']
+	for initial_from in inputs:
 		c = checkNoCycles(initial_from, from_to)
 		if not c[0]:
 			return False, c[1]
@@ -101,52 +148,105 @@ def checkFunction(description, checks=[checkFunctionNoCycles]):
 	for c in checks:
 		c_result = c(description)
 		if not c_result[0]:
-			return False, {c.__name__: c_result[1]}
+			return False, c_result[1]
 	return True, None
 
+
+
+def checkProgramRequirements(program):
+	defined_elements = {**program, **standard_elements_types_inputs_outputs}.keys()
+	for name, description in program.items():
+		elements = getElementsNumbers(description).keys()
+		for e in elements:
+			if not (e in defined_elements):
+				return False, f'Function {name}: Element not declared: {e}'
+	return True, None
+
+def checkProgramInputsOutputs(program):
+	defined_elements = {**program, **standard_elements_types_inputs_outputs}.keys()
+	non_standard_elements_types_inputs_outputs = {}
+	for name, description in program.items():
+		inputs_outputs_for_type = getInputsOutputsNumbersForType(description)
+		if inputs_outputs_for_type['inputs'] == 0:
+			return False, f'Function {name}: 0 inputs'
+		if inputs_outputs_for_type['outputs'] == 0:
+			return False, f'Function {name}: 0 outputs'
+		non_standard_elements_types_inputs_outputs[name] = inputs_outputs_for_type
+	
+	elements_types_inputs_outputs = {
+		**standard_elements_types_inputs_outputs,
+		**non_standard_elements_types_inputs_outputs
+	}
+	
+	for f_name, description in program.items():
+		elements_inputs_outputs = getInputsOutputsNumbersForInnerElements(description)
+		for e_name, value in elements_inputs_outputs.items():
+			e_type = getElementType(e_name)
+			have = elements_inputs_outputs[e_name]
+			have['outputs'] = bool(have['outputs'])
+			should_have = elements_types_inputs_outputs[e_type]
+			should_have['outputs'] = bool(should_have['outputs'])
+			if have != should_have:
+				return False, f'Function {f_name}: Element {e_name}: inputs/outputs do not match: have {have}, should have {should_have}'
+	
+	return True, None
+
+def checkProgram(program, checks=[checkProgramRequirements, checkProgramInputsOutputs]):
+	for c in checks:
+		c_result = c(program)
+		if not c_result[0]:
+			return False, c_result[1]
+	return True, None
+
+
+
 def compile(file_path):
-	result = '''#include <stdio.h>
+	result  = '#include <stdio.h>\n'
+	result += '\n'
+	result += '#define NOT(x) (!(x))\n'
+	result += '#define OR(x, y) ((x) || (y))\n'
+	result += '#define AND(x, y) ((x) && (y))\n'
+	result += '#define OUTPUT(x) (x)\n'
+	result += '\n'
 
-#define NOT(x) (!(x))
-#define OR(x, y) ((x) || (y))
-#define AND(x, y) ((x) && (y))
-#define OUTPUT(x) (x)
-
-'''
 	program = None
 	with open('example.json', 'r') as f:
 		program = json.load(f)
 
+	check_program_result = checkProgram(program)
+	if not check_program_result[0]:
+		raise Exception(f'Program not correct: {check_program_result[1]}')
+
 	outputs_numbers = {}
 	definitions = ''
-	for description in program:
-		check_result = checkFunction(description)
-		if not check_result[0]:
-			raise Exception(f'Function "{description["name"]}" not correct: {check_result[1]}')
-		definition, outputs_number = defineFunction(description)
-		test_function_definition = defineTestFunction(description)
+	for name, description in program.items():
+		check_function_result = checkFunction(description)
+		if not check_function_result[0]:
+			raise Exception(f'Function "{name}" not correct: {check_function_result[1]}')
+		definition, outputs_number = defineFunction(name, description)
+		test_function_definition = defineTestFunction(name, description)
 		definitions += '\n\n' + definition + '\n' + test_function_definition
-		outputs_numbers[description['name']] = outputs_number
+		outputs_numbers[name] = outputs_number
 
-	result += '''
-#define FIRST(A, ...) A
-#define REST(A, ...) __VA_ARGS__
+	result += '#define FIRST(A, ...) A\n'
+	result += '#define REST(A, ...) __VA_ARGS__\n'
+	result += '\n'
+	result += '#define NTH_0(...) FIRST(__VA_ARGS__)\n'
+	result += '\n'
 
-#define NTH_0(...) FIRST(__VA_ARGS__)
-'''
 	for i in range(1, max(outputs_numbers.values())):
 		result += f'#define NTH_{i}(...) NTH_{i-1}(REST(__VA_ARGS__))\n'
 
 	result += definitions
 	result += '\n'
 	result += '\n'
-	result += f"""#define test__all {' && '.join([f'test_{d["name"]}' for d in program])}"""
+	result += f"""#define test__all {' && '.join([f'test_{name}' for name in program.keys()])}"""
 
 	result += '\n'
 	result += '\n'
 	result += 'int main(void) {\n'
 	result += '\tprintf("tests:\\n");\n'
-	result += ''.join([f'\tprintf("\\t{d["name"]}: %s\\n", test_{d["name"]} ? "passed" : "failed");\n' for d in program])
+	result += ''.join([f'\tprintf("\\t{name}: %s\\n", test_{name} ? "passed" : "failed");\n' for name in program.keys()])
 	result += '\tprintf("%s\\n", test__all ? "All tests passed" : "Some tests not OK");\n'
 	result += '\treturn 0;\n'
 	result += '}'
