@@ -6,10 +6,10 @@
 
 - Written in Python 🐍
 - Takes JSON logic schemes representations 👀
-- Checks JSON representation for errors ✔️
+- Checks JSON representation for errors 🧐
 - Requires only wires "from, to" description ➡️
 - Works with nested schemes (i.e defined scheme can be used in other schemes in file as element) 📁
-- Scheme tests can be provided 🧐
+- Scheme tests can be provided ✔️
 
 ### Unique part
 
