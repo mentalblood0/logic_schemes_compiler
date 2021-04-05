@@ -162,18 +162,19 @@ def checkProgramInputsOutputs(program):
 	defined_elements = {**program, **standard_elements_types_inputs_outputs}.keys()
 	non_standard_elements_types_inputs_outputs = {}
 	for name, description in program.items():
-		inputs_outputs_for_type = getInputsOutputsNumbersForType(description)
-		for t in description['tests']:
-			for key in ['inputs', 'outputs']:
-				have = len(t[key])
-				should_have = inputs_outputs_for_type[key]
-				if have != should_have:
-					return False, f'Function {name}: Test {t}: {key} number does not match: have {have}, should have {should_have}'
-		if inputs_outputs_for_type['inputs'] == 0:
-			return False, f'Function {name}: 0 inputs'
-		if inputs_outputs_for_type['outputs'] == 0:
-			return False, f'Function {name}: 0 outputs'
-		non_standard_elements_types_inputs_outputs[name] = inputs_outputs_for_type
+		if 'tests' in description:
+			inputs_outputs_for_type = getInputsOutputsNumbersForType(description)
+			for t in description['tests']:
+				for key in ['inputs', 'outputs']:
+					have = len(t[key])
+					should_have = inputs_outputs_for_type[key]
+					if have != should_have:
+						return False, f'Function {name}: Test {t}: {key} number does not match: have {have}, should have {should_have}'
+			if inputs_outputs_for_type['inputs'] == 0:
+				return False, f'Function {name}: 0 inputs'
+			if inputs_outputs_for_type['outputs'] == 0:
+				return False, f'Function {name}: 0 outputs'
+			non_standard_elements_types_inputs_outputs[name] = inputs_outputs_for_type
 	
 	elements_types_inputs_outputs = {
 		**standard_elements_types_inputs_outputs,
@@ -226,8 +227,10 @@ def compile(file_path):
 		if not check_function_result[0]:
 			raise Exception(f'Function "{name}" not correct: {check_function_result[1]}')
 		definition, outputs_number = defineFunction(name, description)
-		test_function_definition = defineTestFunction(name, description)
-		definitions += '\n\n' + definition + '\n' + test_function_definition
+		definitions += '\n\n' + definition
+		if 'tests' in description:
+			test_function_definition = defineTestFunction(name, description)
+			definitions += '\n' + test_function_definition
 		outputs_numbers[name] = outputs_number
 
 	result += '#define FIRST(A, ...) A\n'
@@ -239,18 +242,22 @@ def compile(file_path):
 	for i in range(1, max(outputs_numbers.values())):
 		result += f'#define NTH_{i + 1}(...) NTH_{i}(REST(__VA_ARGS__))\n'
 
+	functions_names_with_tests = [name for name in program.keys() if 'tests' in program[name]]
+
 	result += definitions
 	result += '\n'
 	result += '\n'
-	result += f"""#define test__all {' && '.join([f'test_{name}' for name in program.keys()])}"""
+	if len(functions_names_with_tests) > 0:
+		result += f"""#define test__all {' && '.join([f'test_{name}' for name in functions_names_with_tests])}"""
 
 	result += '\n'
 	result += '\n'
 	result += 'int main(void) {\n'
-	result += '\tprintf("tests:\\n");\n'
-	result += ''.join([f'\tprintf("\\t{name}: %s\\n", test_{name} ? "passed" : "failed");\n' for name in program.keys()])
-	result += '\tprintf("%s\\n", test__all ? "All tests passed" : "Some tests failed");\n'
-	result += '\treturn 0;\n'
+	if len(functions_names_with_tests) > 0:
+		result += '\tprintf("tests:\\n");\n'
+		result += ''.join([f'\tprintf("\\t{name}: %s\\n", test_{name} ? "passed" : "failed");\n' for name in functions_names_with_tests])
+		result += '\tprintf("%s\\n", test__all ? "All tests passed" : "Some tests failed");\n'
+		result += '\treturn 0;\n'
 	result += '}'
 
 	return result

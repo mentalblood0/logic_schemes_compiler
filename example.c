@@ -12,28 +12,15 @@
 
 
 
-#define __xorxor__xor_1(__xorxor__INPUT_1, __xorxor__INPUT_2) xor(__xorxor__INPUT_1, __xorxor__INPUT_2)
-#define __xorxor__xor_2(__xorxor__INPUT_1, __xorxor__INPUT_2) xor(__xorxor__INPUT_1, __xorxor__INPUT_2)
-#define __xorxor__xor_3(__xorxor__INPUT_1, __xorxor__INPUT_2) xor(NTH_1(__xorxor__xor_1(__xorxor__INPUT_1, __xorxor__INPUT_2)), NTH_1(__xorxor__xor_2(__xorxor__INPUT_1, __xorxor__INPUT_2)))
-#define __xorxor__OUTPUT_1(__xorxor__INPUT_1, __xorxor__INPUT_2) OUTPUT(NTH_1(__xorxor__xor_3(__xorxor__INPUT_1, __xorxor__INPUT_2)))
-#define xorxor(__xorxor__INPUT_1, __xorxor__INPUT_2) __xorxor__OUTPUT_1(__xorxor__INPUT_1, __xorxor__INPUT_2)
-#define test_xorxor ((NTH_1(xorxor(0, 0)) == 0) && (NTH_1(xorxor(1, 0)) == 0) && (NTH_1(xorxor(0, 1)) == 0) && (NTH_1(xorxor(1, 1)) == 0))
+#define __test__NOT_0(__test__INPUT_1, __test__INPUT_2) NOT(__test__INPUT_0[0])
+#define __test__NOT_1(__test__INPUT_1, __test__INPUT_2) NOT(__test__INPUT_1[0])
+#define __test__OR_0(__test__INPUT_1, __test__INPUT_2) OR(__test__INPUT_1[0], __test__INPUT_0[0])
+#define __test__OR_1(__test__INPUT_1, __test__INPUT_2) OR(NTH_0(__test__NOT_0(__test__INPUT_1, __test__INPUT_2)), NTH_0(__test__NOT_1(__test__INPUT_1, __test__INPUT_2)))
+#define __test__AND_0(__test__INPUT_1, __test__INPUT_2) AND(NTH_0(__test__OR_0(__test__INPUT_1, __test__INPUT_2)), NTH_0(__test__OR_1(__test__INPUT_1, __test__INPUT_2)))
+#define __test__OUTPUT_0(__test__INPUT_1, __test__INPUT_2) OUTPUT(NTH_0(__test__AND_0(__test__INPUT_1, __test__INPUT_2)))
+#define test(__test__INPUT_1, __test__INPUT_2) __test__OUTPUT_1(__test__INPUT_1, __test__INPUT_2)
 
-#define __xor__NOT_1(__xor__INPUT_1, __xor__INPUT_2) NOT(__xor__INPUT_1)
-#define __xor__NOT_2(__xor__INPUT_1, __xor__INPUT_2) NOT(__xor__INPUT_2)
-#define __xor__OR_2(__xor__INPUT_1, __xor__INPUT_2) OR(__xor__INPUT_1, __xor__INPUT_2)
-#define __xor__OR_1(__xor__INPUT_1, __xor__INPUT_2) OR(__xor__NOT_1(__xor__INPUT_1, __xor__INPUT_2), __xor__NOT_2(__xor__INPUT_1, __xor__INPUT_2))
-#define __xor__AND_1(__xor__INPUT_1, __xor__INPUT_2) AND(__xor__OR_1(__xor__INPUT_1, __xor__INPUT_2), __xor__OR_2(__xor__INPUT_1, __xor__INPUT_2))
-#define __xor__OUTPUT_1(__xor__INPUT_1, __xor__INPUT_2) OUTPUT(__xor__AND_1(__xor__INPUT_1, __xor__INPUT_2))
-#define xor(__xor__INPUT_1, __xor__INPUT_2) __xor__OUTPUT_1(__xor__INPUT_1, __xor__INPUT_2)
-#define test_xor ((NTH_1(xor(0, 0)) == 0) && (NTH_1(xor(1, 0)) == 1) && (NTH_1(xor(0, 1)) == 1) && (NTH_1(xor(1, 1)) == 0))
 
-#define test__all test_xorxor && test_xor
 
 int main(void) {
-	printf("tests:\n");
-	printf("\txorxor: %s\n", test_xorxor ? "passed" : "failed");
-	printf("\txor: %s\n", test_xor ? "passed" : "failed");
-	printf("%s\n", test__all ? "All tests passed" : "Some tests failed");
-	return 0;
 }
