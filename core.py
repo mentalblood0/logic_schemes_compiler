@@ -86,17 +86,13 @@ def defineFunction(name, description):
 	for e in inputs_by_element.keys():
 		arguments_list = []
 		for i in inputs_by_element[e].values():
-			if '[' in i:
-				i_without_index = getElementName(i)
-				number_of_output_to_take = getInputOutputIndex(i)
-				if getElementType(i) != 'INPUT':
-					argument = f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index}({inputs_string}))"
-				else:
-					argument = f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index})"
-				arguments_list.append(argument)
+			i_without_index = getElementName(i)
+			number_of_output_to_take = getInputOutputIndex(i)
+			if getElementType(i) != 'INPUT':
+				argument = f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index}({inputs_string}))"
 			else:
-				number_of_output_to_take = 0
-				arguments_list.append(f"{macros_prefix}{i}({inputs_string})")
+				argument = f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index})"
+			arguments_list.append(argument)
 		arguments = ', '.join(arguments_list)
 		result += f"#define {macros_prefix}{e}({inputs_string}) {getElementType(e)}({arguments})\n"
 	
