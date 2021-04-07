@@ -1,6 +1,6 @@
 import json
 
-standard_elements_types_inputs_outputs = {
+standard_elements = {
 	'NOT': 		{'inputs': 1, 'outputs': 1},
 	'AND': 		{'inputs': 2, 'outputs': 1},
 	'OR': 		{'inputs': 2, 'outputs': 1},
@@ -13,6 +13,13 @@ def getElementType(element):
 
 def getElementName(element_input_or_output):
 	return element_input_or_output.split('[')[0]
+
+def getElementsTypes(description):
+	result = {}
+	for e in sum([[w['from'], w['to']] for w in description['wires']], []):
+		element_type = getElementType(e)
+		result[element_type] = None
+	return result.keys()
 
 def getElementsNumbers(description):
 	result = {}
@@ -150,17 +157,17 @@ def checkFunction(description, checks=[checkFunctionNoCycles]):
 
 
 def checkProgramRequirements(program):
-	defined_elements = {**program, **standard_elements_types_inputs_outputs}.keys()
+	defined_elements = {**program, **standard_elements}.keys()
 	for name, description in program.items():
-		elements = getElementsNumbers(description).keys()
+		elements = getElementsTypes(program)
 		for e in elements:
 			if not (e in defined_elements):
 				return False, f'Function {name}: Element not declared: {e}'
 	return True, None
 
 def checkProgramInputsOutputs(program):
-	defined_elements = {**program, **standard_elements_types_inputs_outputs}.keys()
-	non_standard_elements_types_inputs_outputs = {}
+	defined_elements = {**program, **standard_elements}.keys()
+	non_standard_elements = {}
 	for name, description in program.items():
 		if 'tests' in description:
 			inputs_outputs_for_type = getInputsOutputsNumbersForType(description)
@@ -174,11 +181,11 @@ def checkProgramInputsOutputs(program):
 				return False, f'Function {name}: 0 inputs'
 			if inputs_outputs_for_type['outputs'] == 0:
 				return False, f'Function {name}: 0 outputs'
-			non_standard_elements_types_inputs_outputs[name] = inputs_outputs_for_type
+			non_standard_elements[name] = inputs_outputs_for_type
 	
 	elements_types_inputs_outputs = {
-		**standard_elements_types_inputs_outputs,
-		**non_standard_elements_types_inputs_outputs
+		**standard_elements,
+		**non_standard_elements
 	}
 	
 	for f_name, description in program.items():
