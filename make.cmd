@@ -1,1 +1,1 @@
-@ python test.py && gcc -E example.c > e.txt && gcc -Wall -Wextra example.c && a.exe
+@ python interface.py --input MAIN.json --link lib --output example.c && gcc -E example.c > e.txt && gcc -Wall -Wextra example.c && a.exe

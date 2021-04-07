@@ -12,13 +12,18 @@
 
 
 
-#define __test__NOT_0(__test__INPUT_1, __test__INPUT_2) NOT(__test__INPUT_0[0])
-#define __test__NOT_1(__test__INPUT_1, __test__INPUT_2) NOT(__test__INPUT_1[0])
-#define __test__OR_0(__test__INPUT_1, __test__INPUT_2) OR(__test__INPUT_1[0], __test__INPUT_0[0])
-#define __test__OR_1(__test__INPUT_1, __test__INPUT_2) OR(NTH_0(__test__NOT_0(__test__INPUT_1, __test__INPUT_2)), NTH_0(__test__NOT_1(__test__INPUT_1, __test__INPUT_2)))
-#define __test__AND_0(__test__INPUT_1, __test__INPUT_2) AND(NTH_0(__test__OR_0(__test__INPUT_1, __test__INPUT_2)), NTH_0(__test__OR_1(__test__INPUT_1, __test__INPUT_2)))
-#define __test__OUTPUT_0(__test__INPUT_1, __test__INPUT_2) OUTPUT(NTH_0(__test__AND_0(__test__INPUT_1, __test__INPUT_2)))
-#define test(__test__INPUT_1, __test__INPUT_2) __test__OUTPUT_1(__test__INPUT_1, __test__INPUT_2)
+#define __xor__NOT_1(__xor__INPUT_1, __xor__INPUT_2) NOT(NTH_1(__xor__INPUT_1))
+#define __xor__NOT_2(__xor__INPUT_1, __xor__INPUT_2) NOT(NTH_1(__xor__INPUT_2))
+#define __xor__OR_1(__xor__INPUT_1, __xor__INPUT_2) OR(NTH_1(__xor__INPUT_1), NTH_1(__xor__INPUT_2))
+#define __xor__OR_2(__xor__INPUT_1, __xor__INPUT_2) OR(NTH_1(__xor__NOT_1(__xor__INPUT_1, __xor__INPUT_2)), NTH_1(__xor__NOT_2(__xor__INPUT_1, __xor__INPUT_2)))
+#define __xor__AND_1(__xor__INPUT_1, __xor__INPUT_2) AND(NTH_1(__xor__OR_1(__xor__INPUT_1, __xor__INPUT_2)), NTH_1(__xor__OR_2(__xor__INPUT_1, __xor__INPUT_2)))
+#define __xor__OUTPUT_1(__xor__INPUT_1, __xor__INPUT_2) OUTPUT(NTH_1(__xor__AND_1(__xor__INPUT_1, __xor__INPUT_2)))
+#define xor(__xor__INPUT_1, __xor__INPUT_2) __xor__OUTPUT_1(__xor__INPUT_1, __xor__INPUT_2)
+
+#define __MAIN__xor_1(__MAIN__INPUT_1, __MAIN__INPUT_2) xor(NTH_1(__MAIN__INPUT_2), NTH_1(__MAIN__INPUT_1))
+#define __MAIN__xor_2(__MAIN__INPUT_1, __MAIN__INPUT_2) xor(NTH_1(__MAIN__xor_1(__MAIN__INPUT_1, __MAIN__INPUT_2)), NTH_1(__MAIN__xor_1(__MAIN__INPUT_1, __MAIN__INPUT_2)))
+#define __MAIN__OUTPUT_1(__MAIN__INPUT_1, __MAIN__INPUT_2) OUTPUT(NTH_1(__MAIN__xor_2(__MAIN__INPUT_1, __MAIN__INPUT_2)))
+#define MAIN(__MAIN__INPUT_1, __MAIN__INPUT_2) __MAIN__OUTPUT_1(__MAIN__INPUT_1, __MAIN__INPUT_2)
 
 
 

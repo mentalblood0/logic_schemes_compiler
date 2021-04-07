@@ -83,12 +83,14 @@ def defineFunction(name, description):
 	for e in inputs_by_element.keys():
 		arguments_list = []
 		for i in inputs_by_element[e].values():
-			if i.split('_')[-2] == 'INPUT':
-				arguments_list.append(f'{macros_prefix}{i}')
-			elif '[' in i:
+			if '[' in i:
 				i_without_index = i.split('[')[0]
 				number_of_output_to_take = i[:-1].split('[')[-1]
-				arguments_list.append(f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index}({inputs_string}))")
+				if i.split('_')[-2] != 'INPUT':
+					argument = f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index}({inputs_string}))"
+				else:
+					argument = f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index})"
+				arguments_list.append(argument)
 			else:
 				number_of_output_to_take = 0
 				arguments_list.append(f"{macros_prefix}{i}({inputs_string})")
@@ -159,7 +161,7 @@ def checkFunction(description, checks=[checkFunctionNoCycles]):
 def checkProgramRequirements(program):
 	defined_elements = {**program, **standard_elements}.keys()
 	for name, description in program.items():
-		elements = getElementsTypes(program)
+		elements = getElementsTypes(description)
 		for e in elements:
 			if not (e in defined_elements):
 				return False, f'Function {name}: Element not declared: {e}'
@@ -169,8 +171,9 @@ def checkProgramInputsOutputs(program):
 	defined_elements = {**program, **standard_elements}.keys()
 	non_standard_elements = {}
 	for name, description in program.items():
+		inputs_outputs_for_type = getInputsOutputsNumbersForType(description)
+		non_standard_elements[name] = inputs_outputs_for_type
 		if 'tests' in description:
-			inputs_outputs_for_type = getInputsOutputsNumbersForType(description)
 			for t in description['tests']:
 				for key in ['inputs', 'outputs']:
 					have = len(t[key])
@@ -181,7 +184,6 @@ def checkProgramInputsOutputs(program):
 				return False, f'Function {name}: 0 inputs'
 			if inputs_outputs_for_type['outputs'] == 0:
 				return False, f'Function {name}: 0 outputs'
-			non_standard_elements[name] = inputs_outputs_for_type
 	
 	elements_types_inputs_outputs = {
 		**standard_elements,
