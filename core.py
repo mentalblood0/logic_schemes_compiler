@@ -203,19 +203,7 @@ def checkProgram(program, checks=[checkProgramRequirements, checkProgramInputsOu
 
 
 
-def compile(file_path):
-	result  = '#include <stdio.h>\n'
-	result += '\n'
-	result += '#define NOT(x) (!(x))\n'
-	result += '#define OR(x, y) ((x) || (y))\n'
-	result += '#define AND(x, y) ((x) && (y))\n'
-	result += '#define OUTPUT(x) (x)\n'
-	result += '\n'
-
-	program = None
-	with open('example.json', 'r') as f:
-		program = json.load(f)
-
+def compile(program):
 	check_program_result = checkProgram(program)
 	if not check_program_result[0]:
 		raise Exception(f'Program not correct: {check_program_result[1]}')
@@ -233,6 +221,13 @@ def compile(file_path):
 			definitions += '\n' + test_function_definition
 		outputs_numbers[name] = outputs_number
 
+	result  = '#include <stdio.h>\n'
+	result += '\n'
+	result += '#define NOT(x) (!(x))\n'
+	result += '#define OR(x, y) ((x) || (y))\n'
+	result += '#define AND(x, y) ((x) && (y))\n'
+	result += '#define OUTPUT(x) (x)\n'
+	result += '\n'
 	result += '#define FIRST(A, ...) A\n'
 	result += '#define REST(A, ...) __VA_ARGS__\n'
 	result += '\n'
