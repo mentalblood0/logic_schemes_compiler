@@ -9,10 +9,13 @@ standard_elements = {
 }
 
 def getElementType(element):
-	return element.split('_')[0]
+	return '_'.join(element.split('_')[:-1])
 
 def getElementName(element_input_or_output):
 	return element_input_or_output.split('[')[0]
+
+def getInputOutputIndex(element_input_or_output):
+	return element_input_or_output[:-1].split('[')[1]
 
 def getElementsTypes(description):
 	result = {}
@@ -57,10 +60,10 @@ def getInputsOutputsNumbersForInnerElements(description):
 def getElementsInputs(description):
 	result = {}
 	for w in description['wires']:
-		element = w['to'].split('[')[0]
+		element = getElementName(w['to'])
 		if not (element in result):
 			result[element] = {}
-		input_index = w['to'][:-1].split('[')[-1]
+		input_index = getInputOutputIndex(w['to'])
 		try:
 			result[element][int(input_index)] = w['from']
 		except ValueError:
@@ -84,9 +87,9 @@ def defineFunction(name, description):
 		arguments_list = []
 		for i in inputs_by_element[e].values():
 			if '[' in i:
-				i_without_index = i.split('[')[0]
-				number_of_output_to_take = i[:-1].split('[')[-1]
-				if i.split('_')[-2] != 'INPUT':
+				i_without_index = getElementName(i)
+				number_of_output_to_take = getInputOutputIndex(i)
+				if getElementType(i) != 'INPUT':
 					argument = f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index}({inputs_string}))"
 				else:
 					argument = f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index})"
@@ -95,7 +98,7 @@ def defineFunction(name, description):
 				number_of_output_to_take = 0
 				arguments_list.append(f"{macros_prefix}{i}({inputs_string})")
 		arguments = ', '.join(arguments_list)
-		result += f"#define {macros_prefix}{e}({inputs_string}) {e.split('_')[0]}({arguments})\n"
+		result += f"#define {macros_prefix}{e}({inputs_string}) {getElementType(e)}({arguments})\n"
 	
 	function_outputs_string = ', '.join([
 		f'{macros_prefix}OUTPUT_{n}({inputs_string})'
@@ -135,13 +138,13 @@ def checkNoCycles(current_from, from_to, stack=[]):
 def checkFunctionNoCycles(description):
 	from_to = {}
 	for w in description['wires']:
-		from_element = w['from'].split('[')[0]
-		to_element = w['to'].split('[')[0]
+		from_element = getElementName(w['from'])
+		to_element = getElementName(w['to'])
 		if not from_element in from_to:
 			from_to[from_element] = []
 		from_to[from_element].append(to_element)
 	
-	inputs = [e for e in from_to if e.split('_')[0] == 'INPUT']
+	inputs = [e for e in from_to if getElementType(e) == 'INPUT']
 	for initial_from in inputs:
 		c = checkNoCycles(initial_from, from_to)
 		if not c[0]:
