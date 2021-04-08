@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-#define NOT(x) (!(x))
-#define OR(x, y) ((x) || (y))
-#define AND(x, y) ((x) && (y))
-#define OUTPUT(x) (x)
+#define NOT(x) !x
+#define OR(x, y) (x || y)
+#define AND(x, y) (x && y)
+#define OUTPUT(x) x
 
 #define FIRST(A, ...) A
 #define REST(A, ...) __VA_ARGS__
@@ -13,6 +13,11 @@
 #define NTH_2(...) NTH_1(REST(__VA_ARGS__))
 #define NTH_3(...) NTH_2(REST(__VA_ARGS__))
 
+
+#define __AND_3__AND_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) AND(NTH_1(__AND_3__INPUT_1), NTH_1(__AND_3__INPUT_2))
+#define __AND_3__AND_2(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) AND(NTH_1(__AND_3__AND_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)), NTH_1(__AND_3__INPUT_3))
+#define __AND_3__OUTPUT_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) OUTPUT(NTH_1(__AND_3__AND_2(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)))
+#define AND_3(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) __AND_3__OUTPUT_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)
 
 #define __OR_3__OR_2(__OR_3__INPUT_1, __OR_3__INPUT_2, __OR_3__INPUT_3) OR(NTH_1(__OR_3__INPUT_1), NTH_1(__OR_3__INPUT_2))
 #define __OR_3__OR_1(__OR_3__INPUT_1, __OR_3__INPUT_2, __OR_3__INPUT_3) OR(NTH_1(__OR_3__OR_2(__OR_3__INPUT_1, __OR_3__INPUT_2, __OR_3__INPUT_3)), NTH_1(__OR_3__INPUT_3))
@@ -56,11 +61,6 @@
 #define test_SUM__7 test_SUM__7__1 && test_SUM__7__2
 #define test_SUM__8 test_SUM__8__1 && test_SUM__8__2
 #define test_SUM test_SUM__1 && test_SUM__2 && test_SUM__3 && test_SUM__4 && test_SUM__5 && test_SUM__6 && test_SUM__7 && test_SUM__8
-
-#define __AND_3__AND_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) AND(NTH_1(__AND_3__INPUT_1), NTH_1(__AND_3__INPUT_2))
-#define __AND_3__AND_2(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) AND(NTH_1(__AND_3__AND_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)), NTH_1(__AND_3__INPUT_3))
-#define __AND_3__OUTPUT_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) OUTPUT(NTH_1(__AND_3__AND_2(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)))
-#define AND_3(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) __AND_3__OUTPUT_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)
 
 #define __MAIN__SUM_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5) SUM(NTH_1(__MAIN__INPUT_5), NTH_1(__MAIN__INPUT_4), NTH_1(__MAIN__INPUT_2))
 #define __MAIN__SUM_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5) SUM(NTH_1(__MAIN__INPUT_3), NTH_1(__MAIN__INPUT_1), NTH_1(__MAIN__SUM_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5)))
