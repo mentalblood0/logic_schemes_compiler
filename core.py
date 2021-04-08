@@ -275,10 +275,13 @@ def compile(program):
 	if len(functions_names_with_tests) > 0:
 		result += '\tprintf("tests:\\n");\n'
 		for name in functions_names_with_tests:
-			result += f'printf("\\t{name}:\\n");\n'
+			result += f'\tprintf("\\t{name}:\\n");\n'
+			outputs_number = len(program[name]['tests'][0]['outputs'])
 			for i in range(len(program[name]['tests'])):
 				t = program[name]['tests'][i]
-				result += f'printf("\\t\\t{t["inputs"]} => {t["outputs"]} %s\\n", test_{name}__{i + 1} ? "passed" : "failed");\n'
+				inputs_string = ', '.join(map(str, t['inputs']))
+				result += f'\tprintf("\\t\\t{t["inputs"]} => {t["outputs"]} %s ([{", ".join(["%d" for i in range(outputs_number)])}])\\n", test_{name}__{i + 1} ? "passed" : "failed", {name}({inputs_string}));\n'
+			result += f'\tprintf("\\t%s\\n", test_{name} ? "{name} tests passed" : "Some tests failed");\n'
 		result += '\tprintf("%s\\n", test__all ? "All tests passed" : "Some tests failed");\n'
 		result += '\treturn 0;\n'
 	result += '}'
