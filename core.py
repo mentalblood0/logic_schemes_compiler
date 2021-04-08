@@ -106,13 +106,29 @@ def defineFunction(name, description):
 
 def defineTestFunction(name, description):
 	equalities_list = []
+	inputs_number = len(description['tests'][0]['inputs'])
+	outputs_number = len(description['tests'][0]['outputs'])
+	tests_number = len(description['tests'])
 	for t in description['tests']:
 		inputs_string = ', '.join(map(str, t['inputs']))
 		for output_index in range(len(t['outputs'])):
 			output = t['outputs'][output_index]
-			equalities_list.append(f"(NTH_{output_index + 1}({name}({inputs_string})) == {output})")
-	equalities = ' && '.join(equalities_list)
-	result = f"#define test_{name} ({equalities})"
+			equalities_list.append(f"NTH_{output_index + 1}({name}({inputs_string})) == {output}")
+	tests_outputs_names_list = [f"test_{name}__{i // outputs_number + 1}__{i % outputs_number + 1}" for i in range(len(equalities_list))]
+	result = '\n'.join([
+		f"#define {tests_outputs_names_list[i]} ({equalities_list[i]})"
+		for i in range(len(equalities_list))
+	])
+	tests_names_list = [
+		f"test_{name}__{i + 1}"
+		for i in range(tests_number)
+	]
+	result += '\n' + '\n'.join([
+		f"#define {tests_names_list[i]} {' && '.join(tests_outputs_names_list[i * outputs_number : (i + 1) * outputs_number])}"
+		for i in range(len(tests_names_list))
+	])
+	tests_names = ' && '.join(tests_names_list)
+	result += '\n' + f"#define test_{name} {tests_names}"
 	return result
 
 
@@ -258,7 +274,11 @@ def compile(program):
 	result += 'int main(void) {\n'
 	if len(functions_names_with_tests) > 0:
 		result += '\tprintf("tests:\\n");\n'
-		result += ''.join([f'\tprintf("\\t{name}: %s\\n", test_{name} ? "passed" : "failed");\n' for name in functions_names_with_tests])
+		for name in functions_names_with_tests:
+			result += f'printf("\\t{name}:\\n");\n'
+			for i in range(len(program[name]['tests'])):
+				t = program[name]['tests'][i]
+				result += f'printf("\\t\\t{t["inputs"]} => {t["outputs"]} %s\\n", test_{name}__{i + 1} ? "passed" : "failed");\n'
 		result += '\tprintf("%s\\n", test__all ? "All tests passed" : "Some tests failed");\n'
 		result += '\treturn 0;\n'
 	result += '}'
