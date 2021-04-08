@@ -26,17 +26,22 @@
 #define __MAIN__AND_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) AND(NTH_1(__MAIN__INPUT_1), NTH_1(__MAIN__INPUT_2))
 #define __MAIN__AND_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) AND(NTH_1(__MAIN__INPUT_1), NTH_1(__MAIN__INPUT_3))
 #define __MAIN__OR_3_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) OR_3(NTH_1(__MAIN__INPUT_1), NTH_1(__MAIN__INPUT_2), NTH_1(__MAIN__INPUT_3))
-#define __MAIN__AND_3(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) AND(NTH_1(__MAIN__INPUT_2), NTH_1(__MAIN__INPUT_3))
 #define __MAIN__AND_3_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) AND_3(NTH_1(__MAIN__INPUT_1), NTH_1(__MAIN__INPUT_2), NTH_1(__MAIN__INPUT_3))
+#define __MAIN__AND_3(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) AND(NTH_1(__MAIN__INPUT_2), NTH_1(__MAIN__INPUT_3))
 #define __MAIN__OR_3_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) OR_3(NTH_1(__MAIN__AND_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)), NTH_1(__MAIN__AND_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)), NTH_1(__MAIN__AND_3(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)))
 #define __MAIN__OUTPUT_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) OUTPUT(NTH_1(__MAIN__OR_3_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)))
-#define __MAIN__AND_4(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) AND(NTH_1(__MAIN__OR_3_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)), NTH_1(__MAIN__NOT_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)))
 #define __MAIN__NOT_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) NOT(NTH_1(__MAIN__OR_3_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)))
+#define __MAIN__AND_4(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) AND(NTH_1(__MAIN__NOT_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)), NTH_1(__MAIN__OR_3_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)))
 #define __MAIN__OR_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) OR(NTH_1(__MAIN__AND_3_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)), NTH_1(__MAIN__AND_4(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)))
 #define __MAIN__OUTPUT_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) OUTPUT(NTH_1(__MAIN__OR_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)))
 #define MAIN(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3) __MAIN__OUTPUT_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3), __MAIN__OUTPUT_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3)
+#define test_MAIN ((NTH_1(MAIN(0, 0, 0)) == 0) && (NTH_2(MAIN(0, 0, 0)) == 0) && (NTH_1(MAIN(0, 0, 1)) == 0) && (NTH_2(MAIN(0, 0, 1)) == 1) && (NTH_1(MAIN(0, 1, 0)) == 0) && (NTH_2(MAIN(0, 1, 0)) == 1) && (NTH_1(MAIN(0, 1, 1)) == 1) && (NTH_2(MAIN(0, 1, 1)) == 0) && (NTH_1(MAIN(1, 0, 0)) == 0) && (NTH_2(MAIN(1, 0, 0)) == 1) && (NTH_1(MAIN(1, 0, 1)) == 1) && (NTH_2(MAIN(1, 0, 1)) == 0) && (NTH_1(MAIN(1, 1, 0)) == 1) && (NTH_2(MAIN(1, 1, 0)) == 0) && (NTH_1(MAIN(1, 1, 1)) == 1) && (NTH_2(MAIN(1, 1, 1)) == 1))
 
-
+#define test__all test_MAIN
 
 int main(void) {
+	printf("tests:\n");
+	printf("\tMAIN: %s\n", test_MAIN ? "passed" : "failed");
+	printf("%s\n", test__all ? "All tests passed" : "Some tests failed");
+	return 0;
 }
