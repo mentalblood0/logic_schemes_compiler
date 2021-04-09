@@ -3,7 +3,11 @@
 #define NOT(x) !x
 #define OR(x, y) (x || y)
 #define AND(x, y) (x && y)
-#define OUTPUT(x) x
+#define OUTPUT(...) __VA_ARGS__
+
+#define xstr(...) str(__VA_ARGS__)
+#define str(...) #__VA_ARGS__
+#define equal(x, y) xstr(x) == xstr(y)
 
 #define FIRST(A, ...) A
 #define REST(A, ...) __VA_ARGS__
@@ -12,12 +16,13 @@
 
 #define NTH_2(...) NTH_1(REST(__VA_ARGS__))
 #define NTH_3(...) NTH_2(REST(__VA_ARGS__))
+#define NTH_4(...) NTH_3(REST(__VA_ARGS__))
+#define NTH_5(...) NTH_4(REST(__VA_ARGS__))
+#define NTH_6(...) NTH_5(REST(__VA_ARGS__))
+#define NTH_7(...) NTH_6(REST(__VA_ARGS__))
+#define NTH_8(...) NTH_7(REST(__VA_ARGS__))
+#define NTH_9(...) NTH_8(REST(__VA_ARGS__))
 
-
-#define __AND_3__AND_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) AND(NTH_1(__AND_3__INPUT_1), NTH_1(__AND_3__INPUT_2))
-#define __AND_3__AND_2(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) AND(NTH_1(__AND_3__AND_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)), NTH_1(__AND_3__INPUT_3))
-#define __AND_3__OUTPUT_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) OUTPUT(NTH_1(__AND_3__AND_2(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)))
-#define AND_3(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) __AND_3__OUTPUT_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)
 
 #define __OR_3__OR_2(__OR_3__INPUT_1, __OR_3__INPUT_2, __OR_3__INPUT_3) OR(NTH_1(__OR_3__INPUT_1), NTH_1(__OR_3__INPUT_2))
 #define __OR_3__OR_1(__OR_3__INPUT_1, __OR_3__INPUT_2, __OR_3__INPUT_3) OR(NTH_1(__OR_3__OR_2(__OR_3__INPUT_1, __OR_3__INPUT_2, __OR_3__INPUT_3)), NTH_1(__OR_3__INPUT_3))
@@ -36,86 +41,48 @@
 #define __SUM__OR_1(__SUM__INPUT_1, __SUM__INPUT_2, __SUM__INPUT_3) OR(NTH_1(__SUM__AND_3_1(__SUM__INPUT_1, __SUM__INPUT_2, __SUM__INPUT_3)), NTH_1(__SUM__AND_4(__SUM__INPUT_1, __SUM__INPUT_2, __SUM__INPUT_3)))
 #define __SUM__OUTPUT_2(__SUM__INPUT_1, __SUM__INPUT_2, __SUM__INPUT_3) OUTPUT(NTH_1(__SUM__OR_1(__SUM__INPUT_1, __SUM__INPUT_2, __SUM__INPUT_3)))
 #define SUM(__SUM__INPUT_1, __SUM__INPUT_2, __SUM__INPUT_3) __SUM__OUTPUT_1(__SUM__INPUT_1, __SUM__INPUT_2, __SUM__INPUT_3), __SUM__OUTPUT_2(__SUM__INPUT_1, __SUM__INPUT_2, __SUM__INPUT_3)
-#define test_SUM__1__1 (NTH_1(SUM(0, 0, 0)) == 0)
-#define test_SUM__1__2 (NTH_2(SUM(0, 0, 0)) == 0)
-#define test_SUM__2__1 (NTH_1(SUM(0, 0, 1)) == 0)
-#define test_SUM__2__2 (NTH_2(SUM(0, 0, 1)) == 1)
-#define test_SUM__3__1 (NTH_1(SUM(0, 1, 0)) == 0)
-#define test_SUM__3__2 (NTH_2(SUM(0, 1, 0)) == 1)
-#define test_SUM__4__1 (NTH_1(SUM(0, 1, 1)) == 1)
-#define test_SUM__4__2 (NTH_2(SUM(0, 1, 1)) == 0)
-#define test_SUM__5__1 (NTH_1(SUM(1, 0, 0)) == 0)
-#define test_SUM__5__2 (NTH_2(SUM(1, 0, 0)) == 1)
-#define test_SUM__6__1 (NTH_1(SUM(1, 0, 1)) == 1)
-#define test_SUM__6__2 (NTH_2(SUM(1, 0, 1)) == 0)
-#define test_SUM__7__1 (NTH_1(SUM(1, 1, 0)) == 1)
-#define test_SUM__7__2 (NTH_2(SUM(1, 1, 0)) == 0)
-#define test_SUM__8__1 (NTH_1(SUM(1, 1, 1)) == 1)
-#define test_SUM__8__2 (NTH_2(SUM(1, 1, 1)) == 1)
-#define test_SUM__1 test_SUM__1__1 && test_SUM__1__2
-#define test_SUM__2 test_SUM__2__1 && test_SUM__2__2
-#define test_SUM__3 test_SUM__3__1 && test_SUM__3__2
-#define test_SUM__4 test_SUM__4__1 && test_SUM__4__2
-#define test_SUM__5 test_SUM__5__1 && test_SUM__5__2
-#define test_SUM__6 test_SUM__6__1 && test_SUM__6__2
-#define test_SUM__7 test_SUM__7__1 && test_SUM__7__2
-#define test_SUM__8 test_SUM__8__1 && test_SUM__8__2
-#define test_SUM test_SUM__1 && test_SUM__2 && test_SUM__3 && test_SUM__4 && test_SUM__5 && test_SUM__6 && test_SUM__7 && test_SUM__8
 
-#define __MAIN__SUM_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5) SUM(NTH_1(__MAIN__INPUT_5), NTH_1(__MAIN__INPUT_4), NTH_1(__MAIN__INPUT_2))
-#define __MAIN__SUM_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5) SUM(NTH_1(__MAIN__INPUT_3), NTH_1(__MAIN__INPUT_1), NTH_1(__MAIN__SUM_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5)))
-#define __MAIN__OUTPUT_3(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5) OUTPUT(NTH_2(__MAIN__SUM_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5)))
-#define __MAIN__OUTPUT_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5) OUTPUT(NTH_2(__MAIN__SUM_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5)))
-#define __MAIN__OUTPUT_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5) OUTPUT(NTH_1(__MAIN__SUM_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5)))
-#define MAIN(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5) __MAIN__OUTPUT_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5), __MAIN__OUTPUT_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5), __MAIN__OUTPUT_3(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5)
-#define test_MAIN__1__1 (NTH_1(MAIN(0, 0, 0, 0, 0)) == 0)
-#define test_MAIN__1__2 (NTH_2(MAIN(0, 0, 0, 0, 0)) == 0)
-#define test_MAIN__1__3 (NTH_3(MAIN(0, 0, 0, 0, 0)) == 0)
-#define test_MAIN__2__1 (NTH_1(MAIN(0, 0, 0, 1, 0)) == 0)
-#define test_MAIN__2__2 (NTH_2(MAIN(0, 0, 0, 1, 0)) == 0)
-#define test_MAIN__2__3 (NTH_3(MAIN(0, 0, 0, 1, 0)) == 1)
-#define test_MAIN__3__1 (NTH_1(MAIN(0, 1, 0, 0, 0)) == 0)
-#define test_MAIN__3__2 (NTH_2(MAIN(0, 1, 0, 0, 0)) == 0)
-#define test_MAIN__3__3 (NTH_3(MAIN(0, 1, 0, 0, 0)) == 1)
-#define test_MAIN__4__1 (NTH_1(MAIN(0, 1, 0, 1, 0)) == 0)
-#define test_MAIN__4__2 (NTH_2(MAIN(0, 1, 0, 1, 0)) == 1)
-#define test_MAIN__4__3 (NTH_3(MAIN(0, 1, 0, 1, 0)) == 0)
-#define test_MAIN__5__1 (NTH_1(MAIN(0, 0, 1, 0, 0)) == 0)
-#define test_MAIN__5__2 (NTH_2(MAIN(0, 0, 1, 0, 0)) == 1)
-#define test_MAIN__5__3 (NTH_3(MAIN(0, 0, 1, 0, 0)) == 0)
-#define test_MAIN__6__1 (NTH_1(MAIN(1, 0, 0, 0, 0)) == 0)
-#define test_MAIN__6__2 (NTH_2(MAIN(1, 0, 0, 0, 0)) == 1)
-#define test_MAIN__6__3 (NTH_3(MAIN(1, 0, 0, 0, 0)) == 0)
-#define test_MAIN__1 test_MAIN__1__1 && test_MAIN__1__2 && test_MAIN__1__3
-#define test_MAIN__2 test_MAIN__2__1 && test_MAIN__2__2 && test_MAIN__2__3
-#define test_MAIN__3 test_MAIN__3__1 && test_MAIN__3__2 && test_MAIN__3__3
-#define test_MAIN__4 test_MAIN__4__1 && test_MAIN__4__2 && test_MAIN__4__3
-#define test_MAIN__5 test_MAIN__5__1 && test_MAIN__5__2 && test_MAIN__5__3
-#define test_MAIN__6 test_MAIN__6__1 && test_MAIN__6__2 && test_MAIN__6__3
-#define test_MAIN test_MAIN__1 && test_MAIN__2 && test_MAIN__3 && test_MAIN__4 && test_MAIN__5 && test_MAIN__6
+#define __AND_3__AND_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) AND(NTH_1(__AND_3__INPUT_1), NTH_1(__AND_3__INPUT_2))
+#define __AND_3__AND_2(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) AND(NTH_1(__AND_3__AND_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)), NTH_1(__AND_3__INPUT_3))
+#define __AND_3__OUTPUT_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) OUTPUT(NTH_1(__AND_3__AND_2(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)))
+#define AND_3(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3) __AND_3__OUTPUT_1(__AND_3__INPUT_1, __AND_3__INPUT_2, __AND_3__INPUT_3)
+
+#define __MAIN__SUM_4(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) SUM(NTH_1(__MAIN__INPUT_8), NTH_1(__MAIN__INPUT_16), NTH_1(__MAIN__INPUT_17))
+#define __MAIN__SUM_3(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) SUM(NTH_1(__MAIN__INPUT_7), NTH_1(__MAIN__INPUT_15), NTH_1(__MAIN__SUM_4(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__SUM_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) SUM(NTH_1(__MAIN__INPUT_6), NTH_1(__MAIN__INPUT_14), NTH_1(__MAIN__SUM_3(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__SUM_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) SUM(NTH_1(__MAIN__INPUT_5), NTH_1(__MAIN__INPUT_13), NTH_1(__MAIN__SUM_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__SUM_5(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) SUM(NTH_1(__MAIN__SUM_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)), NTH_1(__MAIN__INPUT_12), NTH_1(__MAIN__INPUT_4))
+#define __MAIN__SUM_6(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) SUM(NTH_1(__MAIN__INPUT_3), NTH_1(__MAIN__INPUT_11), NTH_1(__MAIN__SUM_5(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__SUM_7(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) SUM(NTH_1(__MAIN__INPUT_2), NTH_1(__MAIN__INPUT_10), NTH_1(__MAIN__SUM_6(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__SUM_8(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) SUM(NTH_1(__MAIN__INPUT_9), NTH_1(__MAIN__INPUT_1), NTH_1(__MAIN__SUM_7(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__OUTPUT_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) OUTPUT(NTH_1(__MAIN__SUM_8(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__OUTPUT_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) OUTPUT(NTH_2(__MAIN__SUM_8(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__OUTPUT_6(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) OUTPUT(NTH_2(__MAIN__SUM_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__OUTPUT_7(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) OUTPUT(NTH_2(__MAIN__SUM_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__OUTPUT_8(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) OUTPUT(NTH_2(__MAIN__SUM_3(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__OUTPUT_9(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) OUTPUT(NTH_2(__MAIN__SUM_4(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__OUTPUT_3(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) OUTPUT(NTH_2(__MAIN__SUM_7(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__OUTPUT_4(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) OUTPUT(NTH_2(__MAIN__SUM_6(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define __MAIN__OUTPUT_5(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) OUTPUT(NTH_2(__MAIN__SUM_5(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)))
+#define MAIN(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17) __MAIN__OUTPUT_1(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17), __MAIN__OUTPUT_2(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17), __MAIN__OUTPUT_3(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17), __MAIN__OUTPUT_4(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17), __MAIN__OUTPUT_5(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17), __MAIN__OUTPUT_6(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17), __MAIN__OUTPUT_7(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17), __MAIN__OUTPUT_8(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17), __MAIN__OUTPUT_9(__MAIN__INPUT_1, __MAIN__INPUT_2, __MAIN__INPUT_3, __MAIN__INPUT_4, __MAIN__INPUT_5, __MAIN__INPUT_6, __MAIN__INPUT_7, __MAIN__INPUT_8, __MAIN__INPUT_9, __MAIN__INPUT_10, __MAIN__INPUT_11, __MAIN__INPUT_12, __MAIN__INPUT_13, __MAIN__INPUT_14, __MAIN__INPUT_15, __MAIN__INPUT_16, __MAIN__INPUT_17)
 
 #define test__all test_SUM && test_MAIN
 
 int main(void) {
 	printf("tests:\n");
-	printf("\tSUM:\n");
-	printf("\t\t[0, 0, 0] => [0, 0] %s ([%d, %d])\n", test_SUM__1 ? "passed" : "failed", SUM(0, 0, 0));
-	printf("\t\t[0, 0, 1] => [0, 1] %s ([%d, %d])\n", test_SUM__2 ? "passed" : "failed", SUM(0, 0, 1));
-	printf("\t\t[0, 1, 0] => [0, 1] %s ([%d, %d])\n", test_SUM__3 ? "passed" : "failed", SUM(0, 1, 0));
-	printf("\t\t[0, 1, 1] => [1, 0] %s ([%d, %d])\n", test_SUM__4 ? "passed" : "failed", SUM(0, 1, 1));
-	printf("\t\t[1, 0, 0] => [0, 1] %s ([%d, %d])\n", test_SUM__5 ? "passed" : "failed", SUM(1, 0, 0));
-	printf("\t\t[1, 0, 1] => [1, 0] %s ([%d, %d])\n", test_SUM__6 ? "passed" : "failed", SUM(1, 0, 1));
-	printf("\t\t[1, 1, 0] => [1, 0] %s ([%d, %d])\n", test_SUM__7 ? "passed" : "failed", SUM(1, 1, 0));
-	printf("\t\t[1, 1, 1] => [1, 1] %s ([%d, %d])\n", test_SUM__8 ? "passed" : "failed", SUM(1, 1, 1));
-	printf("\t%s\n", test_SUM ? "SUM tests passed" : "Some tests failed");
+	int i;	printf("\tSUM:\n");
+	int tests_SUM__inputs[8][3] = {{0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1}, {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
+	int tests_SUM__outputs[8][3] = {{0, 0}, {0, 1}, {0, 1}, {1, 0}, {0, 1}, {1, 0}, {1, 0}, {1, 1}};
+	for (i = 0; i < 8; i++) {
+		int output[2] = {SUM(tests_SUM__inputs[i][0], tests_SUM__inputs[i][1], tests_SUM__inputs[i][2])};
+		printf("\t\t[%d, %d, %d] => [%d, %d]: %s\n", tests_SUM__inputs[i][0], tests_SUM__inputs[i][1], tests_SUM__inputs[i][2], output[0], output[1], ((tests_SUM__outputs[i][0] == output[0]) && (tests_SUM__outputs[i][1] == output[1])) ? "passed" : "failed");
+	}
 	printf("\tMAIN:\n");
-	printf("\t\t[0, 0, 0, 0, 0] => [0, 0, 0] %s ([%d, %d, %d])\n", test_MAIN__1 ? "passed" : "failed", MAIN(0, 0, 0, 0, 0));
-	printf("\t\t[0, 0, 0, 1, 0] => [0, 0, 1] %s ([%d, %d, %d])\n", test_MAIN__2 ? "passed" : "failed", MAIN(0, 0, 0, 1, 0));
-	printf("\t\t[0, 1, 0, 0, 0] => [0, 0, 1] %s ([%d, %d, %d])\n", test_MAIN__3 ? "passed" : "failed", MAIN(0, 1, 0, 0, 0));
-	printf("\t\t[0, 1, 0, 1, 0] => [0, 1, 0] %s ([%d, %d, %d])\n", test_MAIN__4 ? "passed" : "failed", MAIN(0, 1, 0, 1, 0));
-	printf("\t\t[0, 0, 1, 0, 0] => [0, 1, 0] %s ([%d, %d, %d])\n", test_MAIN__5 ? "passed" : "failed", MAIN(0, 0, 1, 0, 0));
-	printf("\t\t[1, 0, 0, 0, 0] => [0, 1, 0] %s ([%d, %d, %d])\n", test_MAIN__6 ? "passed" : "failed", MAIN(1, 0, 0, 0, 0));
-	printf("\t%s\n", test_MAIN ? "MAIN tests passed" : "Some tests failed");
-	printf("%s\n", test__all ? "All tests passed" : "Some tests failed");
+	int tests_MAIN__inputs[7][17] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0}};
+	int tests_MAIN__outputs[7][17] = {{0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 0}};
+	for (i = 0; i < 7; i++) {
+		int output[9] = {MAIN(tests_MAIN__inputs[i][0], tests_MAIN__inputs[i][1], tests_MAIN__inputs[i][2], tests_MAIN__inputs[i][3], tests_MAIN__inputs[i][4], tests_MAIN__inputs[i][5], tests_MAIN__inputs[i][6], tests_MAIN__inputs[i][7], tests_MAIN__inputs[i][8], tests_MAIN__inputs[i][9], tests_MAIN__inputs[i][10], tests_MAIN__inputs[i][11], tests_MAIN__inputs[i][12], tests_MAIN__inputs[i][13], tests_MAIN__inputs[i][14], tests_MAIN__inputs[i][15], tests_MAIN__inputs[i][16])};
+		printf("\t\t[%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d] => [%d, %d, %d, %d, %d, %d, %d, %d, %d]: %s\n", tests_MAIN__inputs[i][0], tests_MAIN__inputs[i][1], tests_MAIN__inputs[i][2], tests_MAIN__inputs[i][3], tests_MAIN__inputs[i][4], tests_MAIN__inputs[i][5], tests_MAIN__inputs[i][6], tests_MAIN__inputs[i][7], tests_MAIN__inputs[i][8], tests_MAIN__inputs[i][9], tests_MAIN__inputs[i][10], tests_MAIN__inputs[i][11], tests_MAIN__inputs[i][12], tests_MAIN__inputs[i][13], tests_MAIN__inputs[i][14], tests_MAIN__inputs[i][15], tests_MAIN__inputs[i][16], output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7], output[8], ((tests_MAIN__outputs[i][0] == output[0]) && (tests_MAIN__outputs[i][1] == output[1]) && (tests_MAIN__outputs[i][2] == output[2]) && (tests_MAIN__outputs[i][3] == output[3]) && (tests_MAIN__outputs[i][4] == output[4]) && (tests_MAIN__outputs[i][5] == output[5]) && (tests_MAIN__outputs[i][6] == output[6]) && (tests_MAIN__outputs[i][7] == output[7]) && (tests_MAIN__outputs[i][8] == output[8])) ? "passed" : "failed");
+	}
 	return 0;
 }

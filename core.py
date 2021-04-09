@@ -111,24 +111,11 @@ def defineTestFunction(name, description):
 	tests_number = len(description['tests'])
 	for t in description['tests']:
 		inputs_string = ', '.join(map(str, t['inputs']))
-		for output_index in range(len(t['outputs'])):
-			output = t['outputs'][output_index]
-			equalities_list.append(f"NTH_{output_index + 1}({name}({inputs_string})) == {output}")
-	tests_outputs_names_list = [f"test_{name}__{i // outputs_number + 1}__{i % outputs_number + 1}" for i in range(len(equalities_list))]
+		equalities_list.append(f"{name}({inputs_string}) == OUTPUT({', '.join(map(str, t['outputs']))})")
 	result = '\n'.join([
-		f"#define {tests_outputs_names_list[i]} ({equalities_list[i]})"
+		f"int test_{name}__{i + 1}() {{return {equalities_list[i]};}}"
 		for i in range(len(equalities_list))
 	])
-	tests_names_list = [
-		f"test_{name}__{i + 1}"
-		for i in range(tests_number)
-	]
-	result += '\n' + '\n'.join([
-		f"#define {tests_names_list[i]} {' && '.join(tests_outputs_names_list[i * outputs_number : (i + 1) * outputs_number])}"
-		for i in range(len(tests_names_list))
-	])
-	tests_names = ' && '.join(tests_names_list)
-	result += '\n' + f"#define test_{name} {tests_names}"
 	return result
 
 
@@ -240,9 +227,9 @@ def compile(program):
 			raise Exception(f'Function "{name}" not correct: {check_function_result[1]}')
 		definition, outputs_number = defineFunction(name, description)
 		definitions += '\n\n' + definition
-		if 'tests' in description:
-			test_function_definition = defineTestFunction(name, description)
-			definitions += '\n' + test_function_definition
+		# if 'tests' in description:
+		# 	test_function_definition = defineTestFunction(name, description)
+		# 	definitions += '\n' + test_function_definition
 		outputs_numbers[name] = outputs_number
 
 	result  = '#include <stdio.h>\n'
@@ -250,7 +237,11 @@ def compile(program):
 	result += '#define NOT(x) !x\n'
 	result += '#define OR(x, y) (x || y)\n'
 	result += '#define AND(x, y) (x && y)\n'
-	result += '#define OUTPUT(x) x\n'
+	result += '#define OUTPUT(...) __VA_ARGS__\n'
+	result += '\n'
+	result += '#define xstr(...) str(__VA_ARGS__)\n'
+	result += '#define str(...) #__VA_ARGS__\n'
+	result += '#define equal(x, y) xstr(x) == xstr(y)\n'
 	result += '\n'
 	result += '#define FIRST(A, ...) A\n'
 	result += '#define REST(A, ...) __VA_ARGS__\n'
@@ -274,15 +265,25 @@ def compile(program):
 	result += 'int main(void) {\n'
 	if len(functions_names_with_tests) > 0:
 		result += '\tprintf("tests:\\n");\n'
+		result += '\tint i;'
 		for name in functions_names_with_tests:
-			result += f'\tprintf("\\t{name}:\\n");\n'
+			tests_number = len(program[name]['tests'])
+			inputs_number = len(program[name]['tests'][0]['inputs'])
 			outputs_number = len(program[name]['tests'][0]['outputs'])
-			for i in range(len(program[name]['tests'])):
-				t = program[name]['tests'][i]
-				inputs_string = ', '.join(map(str, t['inputs']))
-				result += f'\tprintf("\\t\\t{t["inputs"]} => {t["outputs"]} %s ([{", ".join(["%d" for i in range(outputs_number)])}])\\n", test_{name}__{i + 1} ? "passed" : "failed", {name}({inputs_string}));\n'
-			result += f'\tprintf("\\t%s\\n", test_{name} ? "{name} tests passed" : "Some tests failed");\n'
-		result += '\tprintf("%s\\n", test__all ? "All tests passed" : "Some tests failed");\n'
+			result += f'\tprintf("\\t{name}:\\n");\n'
+			for s in ['inputs', 'outputs']:
+				list_init_values_list = map(lambda i: f"{{{i}}}", [", ".join(map(str, t[s])) for t in program[name]['tests']])
+				result += f'\tint tests_{name}__{s}[{tests_number}][{inputs_number}] = {{{", ".join(list_init_values_list)}}};\n'
+			result += f'\tfor (i = 0; i < {tests_number}; i++) {{\n'
+			inputs_values_list = [f'tests_{name}__inputs[i][{j}]' for j in range(inputs_number)]
+			outputs_values_list = [f'tests_{name}__outputs[i][{j}]' for j in range(outputs_number)]
+			result += f'\t\tint output[{outputs_number}] = {{{name}({", ".join(inputs_values_list)})}};\n'
+			printf_template_for_inputs = f'[{", ".join(["%d" for i in range(inputs_number)])}]'
+			printf_template_for_outputs = f'[{", ".join(["%d" for i in range(outputs_number)])}]'
+			printf_values_for_inputs = ', '.join(inputs_values_list)
+			printf_values_for_outputs = ', '.join([f'output[{i}]' for i in range(outputs_number)])
+			result += f'\t\tprintf("\\t\\t{printf_template_for_inputs} => {printf_template_for_outputs}: %s\\n", {printf_values_for_inputs}, {printf_values_for_outputs}, ({" && ".join([f"({outputs_values_list[i]} == output[{i}])" for i in range(len(outputs_values_list))])}) ? "passed" : "failed");\n'
+			result += '\t}\n'
 		result += '\treturn 0;\n'
 	result += '}'
 
