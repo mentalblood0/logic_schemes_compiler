@@ -2,8 +2,6 @@
 
 ## Features
 
-### Ordinary part
-
 - Written in Python 🐍
 - Takes JSON logic schemes representations 👀
 - Checks JSON representation for errors 🧐
@@ -11,10 +9,24 @@
 - Works with nested schemes (i.e defined scheme can be used in other schemes in file as element) 📁
 - Scheme tests can be provided ✔️
 
-### Unique part
-
 - Compiles JSON representation to C file using **only macros** 🤓
-- Tests compiled using only macros, too 😎
+
+## Usage
+
+usage: interface.py [-h] -i INPUT [-t TARGET] -l [LINK ...] -o OUTPUT
+
+Compile logic schemes JSON representations to C file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Path to file with target function
+  -t TARGET, --target TARGET
+                        Name of function to compile
+  -l [LINK ...], --link [LINK ...]
+                        Paths to (input files) / (directories containing input files) with required functions descriptions
+  -o OUTPUT, --output OUTPUT
+                        Path to output file
 
 ## Examples
 
@@ -102,6 +114,10 @@
 	}
 }
 ```
+
+command for compile:
+
+`python interface.py --input lib\xor.json --target xor --link lib --output example.c`
 
 output code: [godbolt 📜](https://godbolt.org/z/8MvfbvMWx) 
 
@@ -293,6 +309,10 @@ output code: [godbolt 📜](https://godbolt.org/z/8MvfbvMWx)
 	}
 }
 ```
+
+command for compile:
+
+`python interface.py --input lib\SUM.json --target SUM --link lib --output example.c`
 
 output code: [godbolt 📜](https://godbolt.org/z/eesEbvdjb) 
 
@@ -665,7 +685,11 @@ output code: [godbolt 📜](https://godbolt.org/z/eesEbvdjb)
 }
 ```
 
- output code: [godbolt 📜](https://godbolt.org/z/Esox1zGWc) 
+command for compile:
+
+`python interface.py --input lib\C_SUM_8.json --target C_SUM_8 --link lib --output example.c` 
+
+output code: [godbolt 📜](https://godbolt.org/z/Esox1zGWc) 
 
 ## Benefits
 
