@@ -13,6 +13,7 @@
 
 ## Usage
 
+```bash
 usage: interface.py [-h] -i INPUT [-t TARGET] -l [LINK ...] -o OUTPUT
 
 Compile logic schemes JSON representations to C file
@@ -27,6 +28,9 @@ optional arguments:
                         Paths to (input files) / (directories containing input files) with required functions descriptions
   -o OUTPUT, --output OUTPUT
                         Path to output file
+```
+
+
 
 ## Examples
 
