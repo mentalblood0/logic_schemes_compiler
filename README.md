@@ -8,7 +8,6 @@
 - Requires only wires "from, to" description ➡️
 - Works with nested schemes (i.e defined scheme can be used in other schemes in file as element) 📁
 - Scheme tests can be provided ✔️
-
 - Compiles JSON representation to C file using **only macros** 🤓
 
 ## Usage
@@ -30,7 +29,9 @@ optional arguments:
                         Path to output file
 ```
 
+## Editor ❗
 
+You can use [this web-based editor](https://notabug.org/mentalblood/logic_schemes_editor) to create and export schemes to JSON compatible with this compiler
 
 ## Examples
 
