@@ -24,72 +24,648 @@
 {
 	"xor": {
 		"wires": [
-			{"from": "INPUT_1", "to": "NOT_1"},
-			{"from": "INPUT_2", "to": "NOT_2"},
-			{"from": "INPUT_1", "to": "OR_2[1]"},
-			{"from": "INPUT_2", "to": "OR_2[2]"},
-			{"from": "NOT_1", "to": "OR_1[1]"},
-			{"from": "NOT_2", "to": "OR_1[2]"},
-			{"from": "OR_1", "to": "AND_1[1]"},
-			{"from": "OR_2", "to": "AND_1[2]"},
-			{"from": "AND_1", "to": "OUTPUT_1"}
+			{
+				"from": "INPUT_2[1]",
+				"to": "NOT_2[1]"
+			},
+			{
+				"from": "INPUT_1[1]",
+				"to": "NOT_1[1]"
+			},
+			{
+				"from": "INPUT_1[1]",
+				"to": "OR_1[1]"
+			},
+			{
+				"from": "INPUT_2[1]",
+				"to": "OR_1[2]"
+			},
+			{
+				"from": "NOT_1[1]",
+				"to": "OR_2[1]"
+			},
+			{
+				"from": "NOT_2[1]",
+				"to": "OR_2[2]"
+			},
+			{
+				"from": "OR_1[1]",
+				"to": "AND_1[2]"
+			},
+			{
+				"from": "AND_1[1]",
+				"to": "OUTPUT_1[1]"
+			},
+			{
+				"from": "OR_2[1]",
+				"to": "AND_1[1]"
+			}
 		],
 		"tests": [
-			{"inputs": [0, 0], "outputs": [0]},
-			{"inputs": [1, 0], "outputs": [1]},
-			{"inputs": [0, 1], "outputs": [1]},
-			{"inputs": [1, 1], "outputs": [0]}
+			{
+				"inputs": [
+					0,
+					0
+				],
+				"outputs": [
+					0
+				]
+			},
+			{
+				"inputs": [
+					1,
+					1
+				],
+				"outputs": [
+					0
+				]
+			},
+			{
+				"inputs": [
+					1,
+					0
+				],
+				"outputs": [
+					1
+				]
+			},
+			{
+				"inputs": [
+					0,
+					1
+				],
+				"outputs": [
+					1
+				]
+			}
 		]
 	}
 }
 ```
 
-output code: [godbolt 📜](https://godbolt.org/z/do3hc675e) 
+output code: [godbolt 📜](https://godbolt.org/z/8MvfbvMWx) 
 
-### XOR of XORs
+### Full bit adder
 
 ```json
 {
-	"xorxor": {
+	"SUM": {
 		"wires": [
-			{"from": "INPUT_1", "to": "xor_1[1]"},
-			{"from": "INPUT_2", "to": "xor_1[2]"},
-			{"from": "INPUT_1", "to": "xor_2[1]"},
-			{"from": "INPUT_2", "to": "xor_2[2]"},
-			{"from": "xor_1[1]", "to": "xor_3[1]"},
-			{"from": "xor_2[1]", "to": "xor_3[2]"},
-			{"from": "xor_3[1]", "to": "OUTPUT_1"}	
+			{
+				"from": "INPUT_1[1]",
+				"to": "AND_1[1]"
+			},
+			{
+				"from": "INPUT_1[1]",
+				"to": "AND_2[1]"
+			},
+			{
+				"from": "INPUT_1[1]",
+				"to": "OR_3_1[1]"
+			},
+			{
+				"from": "INPUT_1[1]",
+				"to": "AND_3_1[1]"
+			},
+			{
+				"from": "INPUT_2[1]",
+				"to": "AND_1[2]"
+			},
+			{
+				"from": "INPUT_2[1]",
+				"to": "AND_3[1]"
+			},
+			{
+				"from": "INPUT_2[1]",
+				"to": "OR_3_1[2]"
+			},
+			{
+				"from": "INPUT_2[1]",
+				"to": "AND_3_1[2]"
+			},
+			{
+				"from": "INPUT_3[1]",
+				"to": "AND_2[2]"
+			},
+			{
+				"from": "INPUT_3[1]",
+				"to": "AND_3[2]"
+			},
+			{
+				"from": "INPUT_3[1]",
+				"to": "OR_3_1[3]"
+			},
+			{
+				"from": "INPUT_3[1]",
+				"to": "AND_3_1[3]"
+			},
+			{
+				"from": "AND_1[1]",
+				"to": "OR_3_2[1]"
+			},
+			{
+				"from": "AND_2[1]",
+				"to": "OR_3_2[2]"
+			},
+			{
+				"from": "AND_3[1]",
+				"to": "OR_3_2[3]"
+			},
+			{
+				"from": "OR_3_2[1]",
+				"to": "OUTPUT_1[1]"
+			},
+			{
+				"from": "OR_3_2[1]",
+				"to": "NOT_1[1]"
+			},
+			{
+				"from": "NOT_1[1]",
+				"to": "AND_4[1]"
+			},
+			{
+				"from": "OR_3_1[1]",
+				"to": "AND_4[2]"
+			},
+			{
+				"from": "AND_3_1[1]",
+				"to": "OR_1[2]"
+			},
+			{
+				"from": "AND_4[1]",
+				"to": "OR_1[1]"
+			},
+			{
+				"from": "OR_1[1]",
+				"to": "OUTPUT_2[1]"
+			}
 		],
 		"tests": [
-			{"inputs": [0, 0], "outputs": [0]},
-			{"inputs": [1, 0], "outputs": [0]},
-			{"inputs": [0, 1], "outputs": [0]},
-			{"inputs": [1, 1], "outputs": [0]}
-		]
-	},
-	"xor": {
-		"wires": [
-			{"from": "INPUT_1", "to": "NOT_1"},
-			{"from": "INPUT_2", "to": "NOT_2"},
-			{"from": "INPUT_1", "to": "OR_2[1]"},
-			{"from": "INPUT_2", "to": "OR_2[2]"},
-			{"from": "NOT_1", "to": "OR_1[1]"},
-			{"from": "NOT_2", "to": "OR_1[2]"},
-			{"from": "OR_1", "to": "AND_1[1]"},
-			{"from": "OR_2", "to": "AND_1[2]"},
-			{"from": "AND_1", "to": "OUTPUT_1"}
-		],
-		"tests": [
-			{"inputs": [0, 0], "outputs": [0]},
-			{"inputs": [1, 0], "outputs": [1]},
-			{"inputs": [0, 1], "outputs": [1]},
-			{"inputs": [1, 1], "outputs": [0]}
+			{
+				"inputs": [
+					0,
+					0,
+					0
+				],
+				"outputs": [
+					0,
+					0
+				]
+			},
+			{
+				"inputs": [
+					0,
+					0,
+					1
+				],
+				"outputs": [
+					0,
+					1
+				]
+			},
+			{
+				"inputs": [
+					0,
+					1,
+					0
+				],
+				"outputs": [
+					0,
+					1
+				]
+			},
+			{
+				"inputs": [
+					0,
+					1,
+					1
+				],
+				"outputs": [
+					1,
+					0
+				]
+			},
+			{
+				"inputs": [
+					1,
+					0,
+					0
+				],
+				"outputs": [
+					0,
+					1
+				]
+			},
+			{
+				"inputs": [
+					1,
+					0,
+					1
+				],
+				"outputs": [
+					1,
+					0
+				]
+			},
+			{
+				"inputs": [
+					1,
+					1,
+					0
+				],
+				"outputs": [
+					1,
+					0
+				]
+			},
+			{
+				"inputs": [
+					1,
+					1,
+					1
+				],
+				"outputs": [
+					1,
+					1
+				]
+			}
 		]
 	}
 }
 ```
 
-output code: [godbolt 📜](https://godbolt.org/z/WT9Pq9qP5) 
+output code: [godbolt 📜](https://godbolt.org/z/eesEbvdjb) 
+
+### Full 8bit adder (cascade)
+
+```json
+{
+	"C_SUM_8": {
+		"wires": [
+			{
+				"from": "INPUT_8[1]",
+				"to": "SUM_4[1]"
+			},
+			{
+				"from": "INPUT_16[1]",
+				"to": "SUM_4[2]"
+			},
+			{
+				"from": "INPUT_17[1]",
+				"to": "SUM_4[3]"
+			},
+			{
+				"from": "INPUT_7[1]",
+				"to": "SUM_3[1]"
+			},
+			{
+				"from": "INPUT_15[1]",
+				"to": "SUM_3[2]"
+			},
+			{
+				"from": "SUM_4[1]",
+				"to": "SUM_3[3]"
+			},
+			{
+				"from": "INPUT_6[1]",
+				"to": "SUM_2[1]"
+			},
+			{
+				"from": "INPUT_14[1]",
+				"to": "SUM_2[2]"
+			},
+			{
+				"from": "SUM_3[1]",
+				"to": "SUM_2[3]"
+			},
+			{
+				"from": "INPUT_5[1]",
+				"to": "SUM_1[1]"
+			},
+			{
+				"from": "INPUT_13[1]",
+				"to": "SUM_1[2]"
+			},
+			{
+				"from": "SUM_2[1]",
+				"to": "SUM_1[3]"
+			},
+			{
+				"from": "SUM_1[1]",
+				"to": "SUM_5[3]"
+			},
+			{
+				"from": "INPUT_12[1]",
+				"to": "SUM_5[2]"
+			},
+			{
+				"from": "INPUT_4[1]",
+				"to": "SUM_5[1]"
+			},
+			{
+				"from": "INPUT_3[1]",
+				"to": "SUM_6[1]"
+			},
+			{
+				"from": "INPUT_11[1]",
+				"to": "SUM_6[2]"
+			},
+			{
+				"from": "INPUT_2[1]",
+				"to": "SUM_7[1]"
+			},
+			{
+				"from": "INPUT_10[1]",
+				"to": "SUM_7[2]"
+			},
+			{
+				"from": "INPUT_9[1]",
+				"to": "SUM_8[2]"
+			},
+			{
+				"from": "INPUT_1[1]",
+				"to": "SUM_8[1]"
+			},
+			{
+				"from": "SUM_5[1]",
+				"to": "SUM_6[3]"
+			},
+			{
+				"from": "SUM_6[1]",
+				"to": "SUM_7[3]"
+			},
+			{
+				"from": "SUM_7[1]",
+				"to": "SUM_8[3]"
+			},
+			{
+				"from": "SUM_8[1]",
+				"to": "OUTPUT_1[1]"
+			},
+			{
+				"from": "SUM_8[2]",
+				"to": "OUTPUT_2[1]"
+			},
+			{
+				"from": "SUM_1[2]",
+				"to": "OUTPUT_6[1]"
+			},
+			{
+				"from": "SUM_2[2]",
+				"to": "OUTPUT_7[1]"
+			},
+			{
+				"from": "SUM_3[2]",
+				"to": "OUTPUT_8[1]"
+			},
+			{
+				"from": "SUM_4[2]",
+				"to": "OUTPUT_9[1]"
+			},
+			{
+				"from": "SUM_7[2]",
+				"to": "OUTPUT_3[1]"
+			},
+			{
+				"from": "SUM_6[2]",
+				"to": "OUTPUT_4[1]"
+			},
+			{
+				"from": "SUM_5[2]",
+				"to": "OUTPUT_5[1]"
+			}
+		],
+		"tests": [
+			{
+				"inputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"outputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			},
+			{
+				"inputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0
+				],
+				"outputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1
+				]
+			},
+			{
+				"inputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"outputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1
+				]
+			},
+			{
+				"inputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0
+				],
+				"outputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0
+				]
+			},
+			{
+				"inputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0,
+					0
+				],
+				"outputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0
+				]
+			},
+			{
+				"inputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"outputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0
+				]
+			},
+			{
+				"inputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0,
+					0
+				],
+				"outputs": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0,
+					0
+				]
+			}
+		]
+	}
+}
+```
+
+ output code: [godbolt 📜](https://godbolt.org/z/Esox1zGWc) 
 
 ## Benefits
 
