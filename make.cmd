@@ -1,1 +1,1 @@
-@ python interface.py --input lib\C_SUM_8.json --target C_SUM_8 --link lib --output example.c && gcc -E example.c > e.txt && gcc -Wall -Wextra example.c && a.exe
+@ python interface.py --input lib\SUM.json --target SUM --link lib --output example.c && gcc -E example.c > e.txt && gcc -Wall -Wextra example.c && a.exe

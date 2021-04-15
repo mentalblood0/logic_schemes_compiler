@@ -9,7 +9,7 @@ standard_elements = {
 }
 
 def getElementType(element):
-	return '_'.join(element.split('_')[:-1])
+	return ' '.join(element.split(' ')[:-1])
 
 def getElementName(element_input_or_output):
 	return element_input_or_output.split('[')[0]
