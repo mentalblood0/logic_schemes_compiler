@@ -104,20 +104,6 @@ def defineFunction(name, description):
 	
 	return result, outputs_number
 
-def defineTestFunction(name, description):
-	equalities_list = []
-	inputs_number = len(description['tests'][0]['inputs'])
-	outputs_number = len(description['tests'][0]['outputs'])
-	tests_number = len(description['tests'])
-	for t in description['tests']:
-		inputs_string = ', '.join(map(str, t['inputs']))
-		equalities_list.append(f"{name}({inputs_string}) == OUTPUT({', '.join(map(str, t['outputs']))})")
-	result = '\n'.join([
-		f"int test_{name}__{i + 1}() {{return {equalities_list[i]};}}"
-		for i in range(len(equalities_list))
-	])
-	return result
-
 
 
 def checkNoCycles(current_from, from_to, stack=[]):
@@ -227,9 +213,6 @@ def compile(program):
 			raise Exception(f'Function "{name}" not correct: {check_function_result[1]}')
 		definition, outputs_number = defineFunction(name, description)
 		definitions += '\n\n' + definition
-		# if 'tests' in description:
-		# 	test_function_definition = defineTestFunction(name, description)
-		# 	definitions += '\n' + test_function_definition
 		outputs_numbers[name] = outputs_number
 
 	result  = '#include <stdio.h>\n'
