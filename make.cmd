@@ -1,1 +1,1 @@
-@ python interface.py --input lib\sum_8.json --target sum_8 --link lib --output example.c && gcc -E example.c > e.txt && gcc -Wall -Wextra example.c && a.exe
+@ python interface.py --input lib\wrapped_sum_8.json --target wrapped_sum_8 --link lib --output example.c && gcc -E example.c > e.txt && gcc -Wall -Wextra example.c && a.exe
