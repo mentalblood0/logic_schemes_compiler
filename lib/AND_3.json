@@ -2,20 +2,20 @@
 	"AND_3": {
 		"wires": [
 			{
-				"from": "INPUT_1[1]",
-				"to": "AND_1[1]"
-			},
-			{
-				"from": "INPUT_2[1]",
-				"to": "AND_1[2]"
-			},
-			{
 				"from": "AND_1[1]",
 				"to": "AND_2[1]"
 			},
 			{
 				"from": "INPUT_3[1]",
 				"to": "AND_2[2]"
+			},
+			{
+				"from": "INPUT_2[1]",
+				"to": "AND_1[2]"
+			},
+			{
+				"from": "INPUT_1[1]",
+				"to": "AND_1[1]"
 			},
 			{
 				"from": "AND_2[1]",

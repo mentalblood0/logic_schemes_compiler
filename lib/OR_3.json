@@ -2,23 +2,23 @@
 	"OR_3": {
 		"wires": [
 			{
-				"from": "INPUT_1[1]",
+				"from": "OR_1[1]",
 				"to": "OR_2[1]"
 			},
 			{
-				"from": "INPUT_2[1]",
+				"from": "INPUT_3[1]",
 				"to": "OR_2[2]"
 			},
 			{
-				"from": "OR_2[1]",
-				"to": "OR_1[1]"
-			},
-			{
-				"from": "INPUT_3[1]",
+				"from": "INPUT_2[1]",
 				"to": "OR_1[2]"
 			},
 			{
-				"from": "OR_1[1]",
+				"from": "INPUT_1[1]",
+				"to": "OR_1[1]"
+			},
+			{
+				"from": "OR_2[1]",
 				"to": "OUTPUT_1[1]"
 			}
 		]

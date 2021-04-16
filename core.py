@@ -9,7 +9,7 @@ standard_elements = {
 }
 
 def getElementType(element):
-	return ' '.join(element.split('_')[:-1])
+	return '_'.join(element.split('_')[:-1])
 
 def getElementName(element_input_or_output):
 	return element_input_or_output.split('[')[0]
@@ -281,7 +281,8 @@ def compile(program):
 			printf_template_for_inputs = f'[{", ".join(["%d" for i in range(inputs_number)])}]'
 			printf_template_for_outputs = f'[{", ".join(["%d" for i in range(outputs_number)])}]'
 			printf_values_for_inputs = ', '.join(inputs_values_list)
-			printf_values_for_outputs = ', '.join([f'output[{i}]' for i in range(outputs_number)])
+			# printf_values_for_outputs = ', '.join([f'output[{i}]' for i in range(outputs_number)])
+			printf_values_for_outputs = ', '.join(outputs_values_list)
 			result += f'\t\tprintf("\\t\\t{printf_template_for_inputs} => {printf_template_for_outputs}: %s\\n", {printf_values_for_inputs}, {printf_values_for_outputs}, ({" && ".join([f"({outputs_values_list[i]} == output[{i}])" for i in range(len(outputs_values_list))])}) ? "passed" : "failed");\n'
 			result += '\t}\n'
 		result += '\treturn 0;\n'
