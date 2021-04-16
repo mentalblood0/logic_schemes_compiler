@@ -886,17 +886,17 @@ void __attribute__((__cdecl__)) __mingw_str_free(void *ptr);
   __attribute__ ((__dllimport__)) size_t __attribute__((__cdecl__)) _fread_nolock_s(void *_DstBuf,size_t _DstSize,size_t _ElementSize,size_t _Count,FILE *_File);
 # 1559 "C:/TDM-GCC-64/x86_64-w64-mingw32/include/stdio.h" 2 3
 # 2 "example.c" 2
-# 45 "example.c"
+# 29 "example.c"
 
-# 45 "example.c"
+# 29 "example.c"
 int main(void) {
  printf("tests:\n");
- int i; printf("\tSUM:\n");
- int tests_SUM__inputs[8][3] = {{0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {0, 1, 1}, {1, 0, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 1}};
- int tests_SUM__outputs[8][3] = {{0, 0}, {0, 1}, {0, 1}, {1, 0}, {0, 1}, {1, 0}, {1, 0}, {1, 1}};
- for (i = 0; i < 8; i++) {
-  int output[2] = {(((tests_SUM__inputs[i][0] && tests_SUM__inputs[i][1]) || (tests_SUM__inputs[i][0] && tests_SUM__inputs[i][2])) || (tests_SUM__inputs[i][1] && tests_SUM__inputs[i][2])), (((tests_SUM__inputs[i][0] && tests_SUM__inputs[i][1]) && tests_SUM__inputs[i][2]) || (!(((tests_SUM__inputs[i][0] && tests_SUM__inputs[i][1]) || (tests_SUM__inputs[i][0] && tests_SUM__inputs[i][2])) || (tests_SUM__inputs[i][1] && tests_SUM__inputs[i][2])) && ((tests_SUM__inputs[i][0] || tests_SUM__inputs[i][1]) || tests_SUM__inputs[i][2])))};
-  printf("\t\t[%d, %d, %d] => [%d, %d]: %s\n", tests_SUM__inputs[i][0], tests_SUM__inputs[i][1], tests_SUM__inputs[i][2], output[0], output[1], ((tests_SUM__outputs[i][0] == output[0]) && (tests_SUM__outputs[i][1] == output[1])) ? "passed" : "failed");
+ int i; printf("\txor:\n");
+ int tests_xor__inputs[4][2] = {{0, 0}, {1, 1}, {1, 0}, {0, 1}};
+ int tests_xor__outputs[4][2] = {{0}, {0}, {1}, {1}};
+ for (i = 0; i < 4; i++) {
+  int output[1] = {((tests_xor__inputs[i][1] || tests_xor__inputs[i][0]) && (!tests_xor__inputs[i][1] || !tests_xor__inputs[i][0]))};
+  printf("\t\t[%d, %d] => [%d]: %s\n", tests_xor__inputs[i][0], tests_xor__inputs[i][1], output[0], ((tests_xor__outputs[i][0] == output[0])) ? "passed" : "failed");
  }
  return 0;
 }
