@@ -79,16 +79,19 @@ def getExpression(inputs_by_element, element_input_or_output):
 		return e_name
 
 	e_inputs = inputs_by_element[e_name]
-	expression_by_type = {
+	expression_by_standard_type = {
 		'OUTPUT': getExpression(inputs_by_element, e_inputs[1]),
 		'NOT': '!' + getExpression(inputs_by_element, e_inputs[1]),
 		'OR': '(' + ' || '.join(map(lambda v: getExpression(inputs_by_element, v), e_inputs.values())) + ')',
 		'AND': '(' + ' && '.join(map(lambda v: getExpression(inputs_by_element, v), e_inputs.values())) + ')'
 	}
-	if not (e_type in expression_by_type):
-		return f'{e_type}({", ".join(map(lambda v: getExpression(inputs_by_element, v), e_inputs.values()))})'
+	if not (e_type in expression_by_standard_type):
+		if '[' in element_input_or_output:
+			e_index = getInputOutputIndex(element_input_or_output)
+			index_part = f'__{e_index}'
+		return f'{e_type}{index_part}({", ".join(map(lambda v: getExpression(inputs_by_element, v), e_inputs.values()))})'
 	else:
-		return expression_by_type[e_type]
+		return expression_by_standard_type[e_type]
 
 def getOutputsExpressions(inputs_by_element):
 	result = {}
@@ -105,10 +108,13 @@ def defineFunction_new(name, description):
 	inputs_by_element = getElementsInputs(description)
 	outputs_expressions = getOutputsExpressions(inputs_by_element)
 	
-	return f'#define {name}({", ".join([f"INPUT_{i}" for i in range(1, inputs_number + 1)])}) {", ".join(outputs_expressions)}', outputs_number
+	inputs_string = ", ".join([f"INPUT_{i}" for i in range(1, inputs_number + 1)])
+	result = '\n'.join([f'#define {name}__{i + 1}({inputs_string}) {outputs_expressions[i]}' for i in range(len(outputs_expressions))])
+	result += f'\n#define {name}({inputs_string}) {", ".join([f"{name}__{i + 1}({inputs_string})" for i in range(len(outputs_expressions))])}'
+
+	return result, outputs_number
 
 def defineFunction(name, description):
-	print('defineFunction', name)
 	result = ''
 
 	inputs_by_element = getElementsInputs(description)
@@ -120,10 +126,8 @@ def defineFunction(name, description):
 	inputs_string = ', '.join([f'{macros_prefix}INPUT_{n}' for n in range(1, inputs_number+1)])
 	
 	for e in inputs_by_element.keys():
-		# print('\t' + e)
 		arguments_list = []
 		for i in inputs_by_element[e].values():
-			# print('\t\t' + i)
 			i_without_index = getElementName(i)
 			number_of_output_to_take = getInputOutputIndex(i)
 			if getElementType(i) != 'INPUT':
@@ -238,7 +242,7 @@ def checkProgram(program, checks=[checkProgramRequirements, checkProgramInputsOu
 
 
 
-def compile(program):
+def compile(program, define_function_function):
 	check_program_result = checkProgram(program)
 	if not check_program_result[0]:
 		raise Exception(f'Program not correct: {check_program_result[1]}')
@@ -249,7 +253,7 @@ def compile(program):
 		check_function_result = checkFunction(description)
 		if not check_function_result[0]:
 			raise Exception(f'Function "{name}" not correct: {check_function_result[1]}')
-		definition, outputs_number = defineFunction(name, description)
+		definition, outputs_number = define_function_function(name, description)
 		definitions += '\n\n' + definition
 		outputs_numbers[name] = outputs_number
 

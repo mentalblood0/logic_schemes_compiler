@@ -6,7 +6,7 @@ import json
 parser = argparse.ArgumentParser(description='Compile logic schemes JSON representations to C file')
 parser.add_argument('-i', '--input', type=str,
 					required=True,
-                    help='Path to file with target function', default=None)
+					help='Path to file with target function', default=None)
 parser.add_argument('-t', '--target', type=str,
 					help='Name of function to compile', default='MAIN')
 parser.add_argument('-l', '--link', type=str, nargs='*',
@@ -45,6 +45,13 @@ del available_functions_descriptions[target_function_name]
 with open(input_path) as f:
 	target_function_description = json.load(f)[target_function_name]
 
+def unique(l):
+	result = []
+	for x in l:
+		if x not in result:
+			result.append(x)
+	return result
+
 def getNonstandardRequirements(
 	target_function_name,
 	target_function_description,
@@ -66,13 +73,15 @@ def getNonstandardRequirements(
 			available_functions_descriptions
 		)
 		indirect_nonstandard_requirements += d_r_nonstandard_requirements
-	return list(set(direct_nonstandard_requirements + indirect_nonstandard_requirements))
+	return unique(direct_nonstandard_requirements + indirect_nonstandard_requirements)
 
 requirements = getNonstandardRequirements(
 	target_function_name,
 	target_function_description,
 	available_functions_descriptions
 )
+# requirements.reverse()
+# print('requirements:', requirements)
 program = {
 	**{
 		r_name: available_functions_descriptions[r_name]
@@ -82,7 +91,7 @@ program = {
 	}
 }
 
-compiled_program = core.compile(program)
+compiled_program = core.compile(program, core.defineFunction_new)
 
 
 with open(output_path, 'w') as f:
