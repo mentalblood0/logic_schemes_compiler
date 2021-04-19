@@ -72,45 +72,13 @@ def getElementsInputs(description):
 
 
 
-def getCalculationRequirements(name, inputs_by_element, buf, already_calculated):
-	e_type = getElementType(name)
-	e_inputs = inputs_by_element[name]
-	if e_type in standard_elements:
-		expression = {
-			'OUTPUT': e_inputs[1],
-			'NOT': '!' + e_inputs[1],
-			'OR': ' || '.join(e_inputs.values()),
-			'AND': ' && '.join(e_inputs.values())
-		}[e_type]
-		print(name, ':', expression)
-	for i in inputs_by_element[name].values():
-		i_name = getElementName(i)
-		if (getElementType(i) != 'INPUT') and not (i_name in already_calculated):
-			buf.append(i_name)
-			getCalculationRequirements(i_name, inputs_by_element, buf, already_calculated)
-			already_calculated.append(i_name)
-
-def getCalculationOrder(inputs_by_element):
-	print('getCalculationOrder')
-	result = {}
-	already_calculated = []
-	for e in inputs_by_element.keys():
-		if getElementType(e) == 'OUTPUT':
-			print(getElementName(e))
-			result[e] = []
-			getCalculationRequirements(e, inputs_by_element, result[e], already_calculated)
-			result[e].reverse()
-	return result
-
-def getExpression(inputs_by_element, key):
-	e = getElementName(key)
-	e_type = getElementType(e)
+def getExpression(inputs_by_element, element_input_or_output):
+	e_name = getElementName(element_input_or_output)
+	e_type = getElementType(element_input_or_output)
 	if e_type == 'INPUT':
-		return e
+		return e_name
 
-	result = {}
-	already_calculated = []
-	e_inputs = inputs_by_element[e]
+	e_inputs = inputs_by_element[e_name]
 	expression_by_type = {
 		'OUTPUT': getExpression(inputs_by_element, e_inputs[1]),
 		'NOT': '!' + getExpression(inputs_by_element, e_inputs[1]),
@@ -127,17 +95,23 @@ def getOutputsExpressions(inputs_by_element):
 	for key in inputs_by_element.keys():
 		if getElementType(key) == 'OUTPUT':
 			result[getElementName(key)] = getExpression(inputs_by_element, key)
-	return result
+	return [result[k] for k in sorted(result.keys())]
 
+def defineFunction_new(name, description):
+	elements_numbers = getElementsNumbers(description)
+	inputs_number = elements_numbers['INPUT']
+	outputs_number = elements_numbers['OUTPUT']
+
+	inputs_by_element = getElementsInputs(description)
+	outputs_expressions = getOutputsExpressions(inputs_by_element)
+	
+	return f'#define {name}({", ".join([f"INPUT_{i}" for i in range(1, inputs_number + 1)])}) {", ".join(outputs_expressions)}', outputs_number
 
 def defineFunction(name, description):
 	print('defineFunction', name)
 	result = ''
-	inputs_by_element = getElementsInputs(description)
-	# print(getCalculationOrder(inputs_by_element))
-	# print(getExpression(inputs_by_element, 'OUTPUT_1'))
-	print(json.dumps(getOutputsExpressions(inputs_by_element), indent=4))
 
+	inputs_by_element = getElementsInputs(description)
 	elements_numbers = getElementsNumbers(description)
 	inputs_number = elements_numbers['INPUT']
 	outputs_number = elements_numbers['OUTPUT']
@@ -297,11 +271,7 @@ def compile(program):
 
 	functions_names_with_tests = [name for name in program.keys() if 'tests' in program[name]]
 
-	result += definitions
-	result += '\n'
-	result += '\n'
-	if len(functions_names_with_tests) > 0:
-		result += f"""#define test__all {' && '.join([f'test_{name}' for name in functions_names_with_tests])}"""
+	result += definitions + '\n'
 
 	result += '\n'
 	result += '\n'

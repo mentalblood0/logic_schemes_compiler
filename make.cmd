@@ -1,1 +1,1 @@
-@ python interface.py --input lib\sum.json --target sum --link lib --output example.c
+@ python interface.py --input lib\sum_8.json --target sum_8 --link lib --output example.c
