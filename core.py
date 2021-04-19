@@ -74,25 +74,25 @@ def getElementsInputs(description):
 
 
 def getExpression(inputs_by_element, element_input_or_output, non_standard_elements_expressions):
-	e_name = getElementName(element_input_or_output)
 	e_type = getElementType(element_input_or_output)
+	e_name = getElementName(element_input_or_output)
 	if e_type == 'INPUT':
 		return e_name
 
 	getExpression_local = lambda v: getExpression(inputs_by_element, v, non_standard_elements_expressions)
 	e_inputs = inputs_by_element[e_name]
-	expression_by_standard_type = {
-		'OUTPUT': getExpression_local(e_inputs[1]),
-		'NOT': '!' + getExpression_local(e_inputs[1]),
-		'OR': '(' + ' || '.join(map(lambda v: getExpression_local(v), e_inputs.values())) + ')',
-		'AND': '(' + ' && '.join(map(lambda v: getExpression_local(v), e_inputs.values())) + ')'
-	}
-	if not (e_type in expression_by_standard_type):
-		if '[' in element_input_or_output:
-			e_index = getInputOutputIndex(element_input_or_output)
-			index_part = f'__{e_index}'
-		# return f'{e_type}{index_part}({", ".join(map(lambda v: getExpression_local(v), e_inputs.values()))})'
+	if e_type in standard_elements:
+		if e_type == 'OUTPUT':
+			return getExpression_local(e_inputs[1])
+		elif e_type == 'NOT':
+			return f'!{getExpression_local(e_inputs[1])}'
+		elif e_type == 'OR':
+			return f'({" || ".join(map(getExpression_local, e_inputs.values()))})'
+		elif e_type == 'AND':
+			return f'({" && ".join(map(getExpression_local, e_inputs.values()))})'
+	else:
 		e_info = non_standard_elements_expressions[e_type]
+		e_index = getInputOutputIndex(element_input_or_output)
 		expression = e_info['expressions'][int(e_index) - 1]
 		inputs_expressions = [getExpression_local(v) for v in e_inputs.values()]
 		inputs_dict = {
@@ -100,8 +100,6 @@ def getExpression(inputs_by_element, element_input_or_output, non_standard_eleme
 			for i in range(e_info['inputs_number'])
 		}
 		return expression.format(**inputs_dict)
-	else:
-		return expression_by_standard_type[e_type]
 
 def getOutputsExpressions(inputs_by_element, non_standard_elements_expressions):
 	result = {}
@@ -113,7 +111,6 @@ def getOutputsExpressions(inputs_by_element, non_standard_elements_expressions):
 find_inputs = re.compile(r'(INPUT_\d+)')
 
 def defineFunction(name, description, non_standard_elements_expressions, is_target):
-	# print('defineFunction', name, non_standard_elements_expressions.keys())
 	elements_numbers = getElementsNumbers(description)
 	inputs_number = elements_numbers['INPUT']
 	outputs_number = elements_numbers['OUTPUT']
@@ -264,25 +261,30 @@ def compile(program, target):
 		tests_number = len(program[name]['tests'])
 		inputs_number = len(program[name]['tests'][0]['inputs'])
 		outputs_number = len(program[name]['tests'][0]['outputs'])
+
 		result += f'\tprintf("\\t{name}:\\n");\n'
 		for s in ['inputs', 'outputs']:
 			list_init_values_list = map(lambda i: f"{{{i}}}", [", ".join(map(str, t[s])) for t in program[name]['tests']])
 			result += f'\tint tests_{name}__{s}[{tests_number}][{inputs_number}] = {{{", ".join(list_init_values_list)}}};\n'
 		result += f'\tfor (i = 0; i < {tests_number}; i++) {{\n'
+		
 		inputs_values_list = [f'tests_{name}__inputs[i][{j}]' for j in range(inputs_number)]
 		outputs_values_list = [f'tests_{name}__outputs[i][{j}]' for j in range(outputs_number)]
 		inputs_values_string = ", ".join(inputs_values_list)
+		
 		outputs_functions_with_args_list = [f"{name}__{i + 1}({inputs_values_string})" for i in range(outputs_number)]
 		outputs_functions_with_args_string = ',\n\t\t\t'.join(outputs_functions_with_args_list)
 		result += f'\t\tint output[{outputs_number}] = {{\n\t\t\t{outputs_functions_with_args_string}\n\t\t}};\n'
+		
 		printf_template_for_inputs = f'[{", ".join(["%d" for i in range(inputs_number)])}]'
 		printf_template_for_outputs = f'[{", ".join(["%d" for i in range(outputs_number)])}]'
 		printf_values_for_inputs = ', '.join(inputs_values_list)
-		# printf_values_for_outputs = ', '.join([f'output[{i}]' for i in range(outputs_number)])
 		printf_values_for_outputs = ', '.join(outputs_values_list)
+		
 		result += f'\t\tprintf("\\t\\t{printf_template_for_inputs} => {printf_template_for_outputs}: %s\\n", {printf_values_for_inputs}, {printf_values_for_outputs}, ({" && ".join([f"({outputs_values_list[i]} == output[{i}])" for i in range(len(outputs_values_list))])}) ? "passed" : "failed");\n'
 		result += '\t}\n'
 		result += '\treturn 0;\n'
+
 	result += '}'
 
 	return result
