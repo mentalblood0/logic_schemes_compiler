@@ -8,7 +8,7 @@
 - Requires only wires "from, to" description ➡️
 - Works with nested schemes (i.e defined scheme can be used in other schemes in file as element) 📁
 - Scheme tests can be provided ✔️
-- Compiles JSON representation to C file using **only macros** 🤓
+- High full (JSON - C - executable) compilation speed 🚀
 
 ## Usage
 
