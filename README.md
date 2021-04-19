@@ -130,7 +130,7 @@ output code: [godbolt 📜](https://godbolt.org/z/M4ThW4aq1)
 
 ```json
 {
-	"SUM": {
+	"sum": {
 		"wires": [
 			{
 				"from": "INPUT_1[1]",
@@ -209,12 +209,12 @@ output code: [godbolt 📜](https://godbolt.org/z/M4ThW4aq1)
 				"to": "AND_4[2]"
 			},
 			{
-				"from": "AND_3_1[1]",
-				"to": "OR_1[2]"
-			},
-			{
 				"from": "AND_4[1]",
 				"to": "OR_1[1]"
+			},
+			{
+				"from": "AND_3_1[1]",
+				"to": "OR_1[2]"
 			},
 			{
 				"from": "OR_1[1]",
@@ -257,6 +257,17 @@ output code: [godbolt 📜](https://godbolt.org/z/M4ThW4aq1)
 			},
 			{
 				"inputs": [
+					1,
+					0,
+					0
+				],
+				"outputs": [
+					0,
+					1
+				]
+			},
+			{
+				"inputs": [
 					0,
 					1,
 					1
@@ -269,19 +280,8 @@ output code: [godbolt 📜](https://godbolt.org/z/M4ThW4aq1)
 			{
 				"inputs": [
 					1,
-					0,
-					0
-				],
-				"outputs": [
-					0,
-					1
-				]
-			},
-			{
-				"inputs": [
 					1,
-					0,
-					1
+					0
 				],
 				"outputs": [
 					1,
@@ -291,8 +291,8 @@ output code: [godbolt 📜](https://godbolt.org/z/M4ThW4aq1)
 			{
 				"inputs": [
 					1,
-					1,
-					0
+					0,
+					1
 				],
 				"outputs": [
 					1,
