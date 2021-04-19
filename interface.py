@@ -80,8 +80,7 @@ requirements = getNonstandardRequirements(
 	target_function_description,
 	available_functions_descriptions
 )
-# requirements.reverse()
-# print('requirements:', requirements)
+requirements.reverse()
 program = {
 	**{
 		r_name: available_functions_descriptions[r_name]
@@ -91,7 +90,7 @@ program = {
 	}
 }
 
-compiled_program = core.compile(program, core.defineFunction_new)
+compiled_program = core.compile(program, target_function_name)
 
 
 with open(output_path, 'w') as f:

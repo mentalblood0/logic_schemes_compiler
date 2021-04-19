@@ -1,4 +1,5 @@
 import json
+import re
 
 standard_elements = {
 	'NOT': 		{'inputs': 1, 'outputs': 1},
@@ -72,79 +73,65 @@ def getElementsInputs(description):
 
 
 
-def getExpression(inputs_by_element, element_input_or_output):
+def getExpression(inputs_by_element, element_input_or_output, non_standard_elements_expressions):
 	e_name = getElementName(element_input_or_output)
 	e_type = getElementType(element_input_or_output)
 	if e_type == 'INPUT':
 		return e_name
 
+	getExpression_local = lambda v: getExpression(inputs_by_element, v, non_standard_elements_expressions)
 	e_inputs = inputs_by_element[e_name]
 	expression_by_standard_type = {
-		'OUTPUT': getExpression(inputs_by_element, e_inputs[1]),
-		'NOT': '!' + getExpression(inputs_by_element, e_inputs[1]),
-		'OR': '(' + ' || '.join(map(lambda v: getExpression(inputs_by_element, v), e_inputs.values())) + ')',
-		'AND': '(' + ' && '.join(map(lambda v: getExpression(inputs_by_element, v), e_inputs.values())) + ')'
+		'OUTPUT': getExpression_local(e_inputs[1]),
+		'NOT': '!' + getExpression_local(e_inputs[1]),
+		'OR': '(' + ' || '.join(map(lambda v: getExpression_local(v), e_inputs.values())) + ')',
+		'AND': '(' + ' && '.join(map(lambda v: getExpression_local(v), e_inputs.values())) + ')'
 	}
 	if not (e_type in expression_by_standard_type):
 		if '[' in element_input_or_output:
 			e_index = getInputOutputIndex(element_input_or_output)
 			index_part = f'__{e_index}'
-		return f'{e_type}{index_part}({", ".join(map(lambda v: getExpression(inputs_by_element, v), e_inputs.values()))})'
+		# return f'{e_type}{index_part}({", ".join(map(lambda v: getExpression_local(v), e_inputs.values()))})'
+		e_info = non_standard_elements_expressions[e_type]
+		expression = e_info['expressions'][int(e_index) - 1]
+		inputs_expressions = [getExpression_local(v) for v in e_inputs.values()]
+		inputs_dict = {
+			f'INPUT_{i+1}': inputs_expressions[i]
+			for i in range(e_info['inputs_number'])
+		}
+		return expression.format(**inputs_dict)
 	else:
 		return expression_by_standard_type[e_type]
 
-def getOutputsExpressions(inputs_by_element):
+def getOutputsExpressions(inputs_by_element, non_standard_elements_expressions):
 	result = {}
 	for key in inputs_by_element.keys():
 		if getElementType(key) == 'OUTPUT':
-			result[getElementName(key)] = getExpression(inputs_by_element, key)
+			result[getElementName(key)] = getExpression(inputs_by_element, key, non_standard_elements_expressions)
 	return [result[k] for k in sorted(result.keys())]
 
-def defineFunction_new(name, description):
+find_inputs = re.compile(r'(INPUT_\d+)')
+
+def defineFunction(name, description, non_standard_elements_expressions, is_target):
+	# print('defineFunction', name, non_standard_elements_expressions.keys())
 	elements_numbers = getElementsNumbers(description)
 	inputs_number = elements_numbers['INPUT']
 	outputs_number = elements_numbers['OUTPUT']
 
 	inputs_by_element = getElementsInputs(description)
-	outputs_expressions = getOutputsExpressions(inputs_by_element)
+	outputs_expressions = getOutputsExpressions(inputs_by_element, non_standard_elements_expressions)
 	
 	inputs_string = ", ".join([f"INPUT_{i}" for i in range(1, inputs_number + 1)])
-	result = '\n'.join([f'#define {name}__{i + 1}({inputs_string}) {outputs_expressions[i]}' for i in range(len(outputs_expressions))])
-	result += f'\n#define {name}({inputs_string}) {", ".join([f"{name}__{i + 1}({inputs_string})" for i in range(len(outputs_expressions))])}'
 
-	return result, outputs_number
-
-def defineFunction(name, description):
-	result = ''
-
-	inputs_by_element = getElementsInputs(description)
-	elements_numbers = getElementsNumbers(description)
-	inputs_number = elements_numbers['INPUT']
-	outputs_number = elements_numbers['OUTPUT']
-
-	macros_prefix = '__' + name + '__'
-	inputs_string = ', '.join([f'{macros_prefix}INPUT_{n}' for n in range(1, inputs_number+1)])
-	
-	for e in inputs_by_element.keys():
-		arguments_list = []
-		for i in inputs_by_element[e].values():
-			i_without_index = getElementName(i)
-			number_of_output_to_take = getInputOutputIndex(i)
-			if getElementType(i) != 'INPUT':
-				argument = f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index}({inputs_string}))"
-			else:
-				argument = f"NTH_{number_of_output_to_take}({macros_prefix}{i_without_index})"
-			arguments_list.append(argument)
-		arguments = ', '.join(arguments_list)
-		result += f"#define {macros_prefix}{e}({inputs_string}) {getElementType(e)}({arguments})\n"
-	
-	function_outputs_string = ', '.join([
-		f'{macros_prefix}OUTPUT_{n}({inputs_string})'
-		for n in range(1, outputs_number + 1)
-	])
-	result += f"#define {name}({inputs_string}) {function_outputs_string}"
-	
-	return result, outputs_number
+	if is_target:
+		result = '\n'.join([f'#define {name}__{i + 1}({inputs_string}) {outputs_expressions[i]}' for i in range(len(outputs_expressions))])
+		return result, outputs_number
+	else:
+		non_standard_elements_expressions[name] = {
+			'inputs_number': inputs_number,
+			'expressions': [find_inputs.sub(r'{\1}', e) for e in outputs_expressions]
+		}
+		return None, outputs_number
 
 
 
@@ -242,36 +229,25 @@ def checkProgram(program, checks=[checkProgramRequirements, checkProgramInputsOu
 
 
 
-def compile(program, define_function_function):
+def compile(program, target):
 	check_program_result = checkProgram(program)
 	if not check_program_result[0]:
 		raise Exception(f'Program not correct: {check_program_result[1]}')
 
 	outputs_numbers = {}
 	definitions = ''
+	non_standard_elements_expressions = {}
 	for name, description in program.items():
 		check_function_result = checkFunction(description)
 		if not check_function_result[0]:
 			raise Exception(f'Function "{name}" not correct: {check_function_result[1]}')
-		definition, outputs_number = define_function_function(name, description)
-		definitions += '\n\n' + definition
+		is_target = target == name
+		definition, outputs_number = defineFunction(name, description, non_standard_elements_expressions, is_target=is_target)
+		if is_target:
+			definitions += '\n\n' + definition
 		outputs_numbers[name] = outputs_number
 
 	result  = '#include <stdio.h>\n'
-	result += '\n'
-	result += '#define NOT(x) !x\n'
-	result += '#define OR(x, y) (x || y)\n'
-	result += '#define AND(x, y) (x && y)\n'
-	result += '#define OUTPUT(...) __VA_ARGS__\n'
-	result += '\n'
-	result += '#define FIRST(A, ...) A\n'
-	result += '#define REST(A, ...) __VA_ARGS__\n'
-	result += '\n'
-	result += '#define NTH_1(...) FIRST(__VA_ARGS__)\n'
-	result += '\n'
-
-	for i in range(1, max(outputs_numbers.values())):
-		result += f'#define NTH_{i + 1}(...) NTH_{i}(REST(__VA_ARGS__))\n'
 
 	functions_names_with_tests = [name for name in program.keys() if 'tests' in program[name]]
 
@@ -280,28 +256,32 @@ def compile(program, define_function_function):
 	result += '\n'
 	result += '\n'
 	result += 'int main(void) {\n'
-	if len(functions_names_with_tests) > 0:
+	if 'tests' in program[target]:
+		name = target
 		result += '\tprintf("tests:\\n");\n'
 		result += '\tint i;'
-		for name in functions_names_with_tests:
-			tests_number = len(program[name]['tests'])
-			inputs_number = len(program[name]['tests'][0]['inputs'])
-			outputs_number = len(program[name]['tests'][0]['outputs'])
-			result += f'\tprintf("\\t{name}:\\n");\n'
-			for s in ['inputs', 'outputs']:
-				list_init_values_list = map(lambda i: f"{{{i}}}", [", ".join(map(str, t[s])) for t in program[name]['tests']])
-				result += f'\tint tests_{name}__{s}[{tests_number}][{inputs_number}] = {{{", ".join(list_init_values_list)}}};\n'
-			result += f'\tfor (i = 0; i < {tests_number}; i++) {{\n'
-			inputs_values_list = [f'tests_{name}__inputs[i][{j}]' for j in range(inputs_number)]
-			outputs_values_list = [f'tests_{name}__outputs[i][{j}]' for j in range(outputs_number)]
-			result += f'\t\tint output[{outputs_number}] = {{{name}({", ".join(inputs_values_list)})}};\n'
-			printf_template_for_inputs = f'[{", ".join(["%d" for i in range(inputs_number)])}]'
-			printf_template_for_outputs = f'[{", ".join(["%d" for i in range(outputs_number)])}]'
-			printf_values_for_inputs = ', '.join(inputs_values_list)
-			# printf_values_for_outputs = ', '.join([f'output[{i}]' for i in range(outputs_number)])
-			printf_values_for_outputs = ', '.join(outputs_values_list)
-			result += f'\t\tprintf("\\t\\t{printf_template_for_inputs} => {printf_template_for_outputs}: %s\\n", {printf_values_for_inputs}, {printf_values_for_outputs}, ({" && ".join([f"({outputs_values_list[i]} == output[{i}])" for i in range(len(outputs_values_list))])}) ? "passed" : "failed");\n'
-			result += '\t}\n'
+
+		tests_number = len(program[name]['tests'])
+		inputs_number = len(program[name]['tests'][0]['inputs'])
+		outputs_number = len(program[name]['tests'][0]['outputs'])
+		result += f'\tprintf("\\t{name}:\\n");\n'
+		for s in ['inputs', 'outputs']:
+			list_init_values_list = map(lambda i: f"{{{i}}}", [", ".join(map(str, t[s])) for t in program[name]['tests']])
+			result += f'\tint tests_{name}__{s}[{tests_number}][{inputs_number}] = {{{", ".join(list_init_values_list)}}};\n'
+		result += f'\tfor (i = 0; i < {tests_number}; i++) {{\n'
+		inputs_values_list = [f'tests_{name}__inputs[i][{j}]' for j in range(inputs_number)]
+		outputs_values_list = [f'tests_{name}__outputs[i][{j}]' for j in range(outputs_number)]
+		inputs_values_string = ", ".join(inputs_values_list)
+		outputs_functions_with_args_list = [f"{name}__{i + 1}({inputs_values_string})" for i in range(outputs_number)]
+		outputs_functions_with_args_string = ',\n\t\t\t'.join(outputs_functions_with_args_list)
+		result += f'\t\tint output[{outputs_number}] = {{\n\t\t\t{outputs_functions_with_args_string}\n\t\t}};\n'
+		printf_template_for_inputs = f'[{", ".join(["%d" for i in range(inputs_number)])}]'
+		printf_template_for_outputs = f'[{", ".join(["%d" for i in range(outputs_number)])}]'
+		printf_values_for_inputs = ', '.join(inputs_values_list)
+		# printf_values_for_outputs = ', '.join([f'output[{i}]' for i in range(outputs_number)])
+		printf_values_for_outputs = ', '.join(outputs_values_list)
+		result += f'\t\tprintf("\\t\\t{printf_template_for_inputs} => {printf_template_for_outputs}: %s\\n", {printf_values_for_inputs}, {printf_values_for_outputs}, ({" && ".join([f"({outputs_values_list[i]} == output[{i}])" for i in range(len(outputs_values_list))])}) ? "passed" : "failed");\n'
+		result += '\t}\n'
 		result += '\treturn 0;\n'
 	result += '}'
 
