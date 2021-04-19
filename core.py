@@ -72,9 +72,71 @@ def getElementsInputs(description):
 
 
 
+def getCalculationRequirements(name, inputs_by_element, buf, already_calculated):
+	e_type = getElementType(name)
+	e_inputs = inputs_by_element[name]
+	if e_type in standard_elements:
+		expression = {
+			'OUTPUT': e_inputs[1],
+			'NOT': '!' + e_inputs[1],
+			'OR': ' || '.join(e_inputs.values()),
+			'AND': ' && '.join(e_inputs.values())
+		}[e_type]
+		print(name, ':', expression)
+	for i in inputs_by_element[name].values():
+		i_name = getElementName(i)
+		if (getElementType(i) != 'INPUT') and not (i_name in already_calculated):
+			buf.append(i_name)
+			getCalculationRequirements(i_name, inputs_by_element, buf, already_calculated)
+			already_calculated.append(i_name)
+
+def getCalculationOrder(inputs_by_element):
+	print('getCalculationOrder')
+	result = {}
+	already_calculated = []
+	for e in inputs_by_element.keys():
+		if getElementType(e) == 'OUTPUT':
+			print(getElementName(e))
+			result[e] = []
+			getCalculationRequirements(e, inputs_by_element, result[e], already_calculated)
+			result[e].reverse()
+	return result
+
+def getExpression(inputs_by_element, key):
+	e = getElementName(key)
+	e_type = getElementType(e)
+	if e_type == 'INPUT':
+		return e
+
+	result = {}
+	already_calculated = []
+	e_inputs = inputs_by_element[e]
+	expression_by_type = {
+		'OUTPUT': getExpression(inputs_by_element, e_inputs[1]),
+		'NOT': '!' + getExpression(inputs_by_element, e_inputs[1]),
+		'OR': '(' + ' || '.join(map(lambda v: getExpression(inputs_by_element, v), e_inputs.values())) + ')',
+		'AND': '(' + ' && '.join(map(lambda v: getExpression(inputs_by_element, v), e_inputs.values())) + ')'
+	}
+	if not (e_type in expression_by_type):
+		return f'{e_type}({", ".join(map(lambda v: getExpression(inputs_by_element, v), e_inputs.values()))})'
+	else:
+		return expression_by_type[e_type]
+
+def getOutputsExpressions(inputs_by_element):
+	result = {}
+	for key in inputs_by_element.keys():
+		if getElementType(key) == 'OUTPUT':
+			result[getElementName(key)] = getExpression(inputs_by_element, key)
+	return result
+
+
 def defineFunction(name, description):
+	print('defineFunction', name)
 	result = ''
 	inputs_by_element = getElementsInputs(description)
+	# print(getCalculationOrder(inputs_by_element))
+	# print(getExpression(inputs_by_element, 'OUTPUT_1'))
+	print(json.dumps(getOutputsExpressions(inputs_by_element), indent=4))
 
 	elements_numbers = getElementsNumbers(description)
 	inputs_number = elements_numbers['INPUT']
@@ -84,8 +146,10 @@ def defineFunction(name, description):
 	inputs_string = ', '.join([f'{macros_prefix}INPUT_{n}' for n in range(1, inputs_number+1)])
 	
 	for e in inputs_by_element.keys():
+		# print('\t' + e)
 		arguments_list = []
 		for i in inputs_by_element[e].values():
+			# print('\t\t' + i)
 			i_without_index = getElementName(i)
 			number_of_output_to_take = getInputOutputIndex(i)
 			if getElementType(i) != 'INPUT':
