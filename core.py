@@ -251,6 +251,22 @@ def compile(program, target):
 	result += '\n'
 	result += definition + '\n'
 	result += '\n'
+	result += 'void printArray(int *a, int length, const char *delimiter) {\n'
+	result += '\tint i;\n'
+	result += '\tprintf("%d", a[0]);\n'
+	result += '\tfor (i = 1; i < length; i++)\n'
+	result += '\t\tprintf("%s%d", delimiter, a[i]);\n'
+	result += '}\n'
+	result += '\n'
+	result += 'int isEqual(int *a, int *b, int length) {\n'
+	result += '\tint i;\n'
+	result += '\tfor (i = 0; i < length; i++)\n'
+	result += '\t\tif (a[i] != b[i])\n'
+	result += '\t\treturn 0;\n'
+	result += '\treturn 1;\n'
+	result += '}\n'
+	result += '\n'
+
 	result += 'int main(void) {\n'
 	if 'tests' in program[target]:
 		result += f'\tprintf("tests for {target}:\\n");\n'
@@ -261,23 +277,24 @@ def compile(program, target):
 
 		for s in ['inputs', 'outputs']:
 			list_init_values_list = map(lambda i: f"{{{i}}}", [", ".join(map(str, t[s])) for t in program[target]['tests']])
-			result += f'\tint tests_{target}__{s}[{tests_number}][{inputs_number}] = {{{", ".join(list_init_values_list)}}};\n'
+			result += f'\tint tests_{s}[{tests_number}][{inputs_number if s == "inputs" else outputs_number}] = {{{", ".join(list_init_values_list)}}};\n'
 		
 		result += '\tint i;\n'
+		result += '\tint *output;\n'
 		result += f'\tfor (i = 0; i < {tests_number}; i++) {{\n'
 		
-		inputs_values_list = [f'tests_{target}__inputs[i][{j}]' for j in range(inputs_number)]
-		outputs_values_list = [f'tests_{target}__outputs[i][{j}]' for j in range(outputs_number)]
+		inputs_values_list = [f'tests_inputs[i][{j}]' for j in range(inputs_number)]
+		outputs_values_list = [f'tests_outputs[i][{j}]' for j in range(outputs_number)]
 		inputs_values_string = ", ".join(inputs_values_list)
 		
-		result += f'\t\tint *output = {target}({inputs_values_string});\n'
+		result += f'\t\toutput = {target}({inputs_values_string});\n'
+		result += '\t\tprintf("[");\n'
+		result += f'\t\tprintArray(tests_inputs[i], {inputs_number}, ", ");\n'
+		result += '\t\tprintf("] => [");\n'
+		result += f'\t\tprintArray(tests_outputs[i], {outputs_number}, ", ");\n'
+		result += f'\t\tprintf("] %s\\n", isEqual(tests_outputs[i], output, {outputs_number}) ? "passed" : "failed");\n'
+		result += '\t\tfree(output);\n'
 		
-		printf_template_for_inputs = f'[{", ".join(["%d" for i in range(inputs_number)])}]'
-		printf_template_for_outputs = f'[{", ".join(["%d" for i in range(outputs_number)])}]'
-		printf_values_for_inputs = ', '.join(inputs_values_list)
-		printf_values_for_outputs = ', '.join(outputs_values_list)
-		
-		result += f'\t\tprintf("{printf_template_for_inputs} => {printf_template_for_outputs}: %s\\n", {printf_values_for_inputs}, {printf_values_for_outputs}, ({" && ".join([f"({outputs_values_list[i]} == output[{i}])" for i in range(len(outputs_values_list))])}) ? "passed" : "failed");\n'
 		result += '\t}\n'
 		result += '\treturn 0;\n'
 
