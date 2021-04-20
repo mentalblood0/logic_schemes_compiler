@@ -108,7 +108,7 @@ def getOutputsExpressions(inputs_by_element, non_standard_elements_expressions):
 			result[getElementName(key)] = getExpression(inputs_by_element, key, non_standard_elements_expressions)
 	return [result[k] for k in sorted(result.keys())]
 
-find_inputs = re.compile(r'(INPUT_\d+)')
+find_inputs = re.compile(r'INPUT(_\d+)')
 
 def defineFunction(name, description, non_standard_elements_expressions, is_target):
 	elements_numbers = getElementsNumbers(description)
@@ -125,7 +125,7 @@ def defineFunction(name, description, non_standard_elements_expressions, is_targ
 	else:
 		non_standard_elements_expressions[name] = {
 			'inputs_number': inputs_number,
-			'expressions': [find_inputs.sub(r'{\1}', e) for e in outputs_expressions]
+			'expressions': [find_inputs.sub(r'{INPUT\1}', e) for e in outputs_expressions]
 		}
 		return None
 
@@ -277,5 +277,7 @@ def compile(program, target):
 		result += '\treturn 0;\n'
 
 	result += '}'
+
+	result = find_inputs.sub(r'\1', result)
 
 	return result
