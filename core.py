@@ -118,10 +118,16 @@ def defineFunction(name, description, non_standard_elements_expressions, is_targ
 	inputs_by_element = getElementsInputs(description)
 	outputs_expressions = getOutputsExpressions(inputs_by_element, non_standard_elements_expressions)
 	
-	inputs_string = ", ".join([f"INPUT_{i+1}" for i in range(inputs_number)])
+	inputs_string = ", ".join([f"int INPUT_{i+1}" for i in range(inputs_number)])
 
 	if is_target:
-		return '\n'.join([f'#define {name}__{i+1}({inputs_string}) {outputs_expressions[i]}' for i in range(len(outputs_expressions))])
+		result  = f'int* {name}({inputs_string}) {{\n'
+		result += f'\tint *result = malloc(sizeof(int) * {outputs_number});\n'
+		for i in range(len(outputs_expressions)):
+			result += f'\tresult[{i}] = {outputs_expressions[i]};\n'
+		result += '\treturn result;\n'
+		result += '}'
+		return result
 	else:
 		non_standard_elements_expressions[name] = {
 			'inputs_number': inputs_number,
@@ -241,6 +247,7 @@ def compile(program, target):
 			definition = definition
 
 	result  = '#include <stdio.h>\n'
+	result += '#include <stdlib.h>\n'
 	result += '\n'
 	result += definition + '\n'
 	result += '\n'
@@ -263,9 +270,7 @@ def compile(program, target):
 		outputs_values_list = [f'tests_{target}__outputs[i][{j}]' for j in range(outputs_number)]
 		inputs_values_string = ", ".join(inputs_values_list)
 		
-		outputs_functions_with_args_list = [f"{target}__{i+1}({inputs_values_string})" for i in range(outputs_number)]
-		outputs_functions_with_args_string = ',\n\t\t\t'.join(outputs_functions_with_args_list)
-		result += f'\t\tint output[{outputs_number}] = {{\n\t\t\t{outputs_functions_with_args_string}\n\t\t}};\n'
+		result += f'\t\tint *output = {target}({inputs_values_string});\n'
 		
 		printf_template_for_inputs = f'[{", ".join(["%d" for i in range(inputs_number)])}]'
 		printf_template_for_outputs = f'[{", ".join(["%d" for i in range(outputs_number)])}]'
