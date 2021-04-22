@@ -699,7 +699,7 @@ output code: [godbolt 📜](https://godbolt.org/z/q471hr8Ee)
 ## Benefits
 
 - Super-easy to integrate with any logic schemes editor 🔌
-- Results in macros, so C compiler can easily optimize them 🎯
+- Results in logic expressions, so C compiler can easily optimize them 🎯
 - Supports nesting 📁
 
 ## So
