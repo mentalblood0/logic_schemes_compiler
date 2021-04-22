@@ -124,7 +124,7 @@ command for compile:
 
 `python interface.py --input lib\xor.json --target xor --link lib --output example.c`
 
-output code: [godbolt 📜](https://godbolt.org/z/M4ThW4aq1) 
+output code: [godbolt 📜](https://godbolt.org/z/c4TT5Trvv) 
 
 ### Full bit adder
 
@@ -319,7 +319,7 @@ command for compile:
 
 `python interface.py --input lib\sum.json --target sum --link lib --output example.c`
 
-output code: [godbolt 📜](https://godbolt.org/z/KdnzGY8zY) 
+output code: [godbolt 📜](https://godbolt.org/z/b37a8ab47) 
 
 ### Full 8bit adder (cascade)
 
@@ -694,7 +694,7 @@ command for compile:
 
 `python interface.py --input lib\sum_8.json --target sum_8 --link lib --output example.c` 
 
-output code: [godbolt 📜](https://godbolt.org/z/YsMfW83x5) 
+output code: [godbolt 📜](https://godbolt.org/z/q471hr8Ee) 
 
 ## Benefits
 
