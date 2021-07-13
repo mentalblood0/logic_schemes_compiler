@@ -1,136 +1,136 @@
 {
-	"sum_8": {
+	"SUM_8": {
 		"wires": [
 			{
 				"from": "INPUT_16[1]",
-				"to": "sum_1[1]"
+				"to": "SUM_1[1]"
 			},
 			{
 				"from": "INPUT_8[1]",
-				"to": "sum_1[2]"
+				"to": "SUM_1[2]"
 			},
 			{
 				"from": "INPUT_7[1]",
-				"to": "sum_2[2]"
+				"to": "SUM_2[2]"
 			},
 			{
 				"from": "INPUT_15[1]",
-				"to": "sum_2[1]"
+				"to": "SUM_2[1]"
 			},
 			{
 				"from": "INPUT_17[1]",
-				"to": "sum_1[3]"
+				"to": "SUM_1[3]"
 			},
 			{
-				"from": "sum_1[1]",
-				"to": "sum_2[3]"
+				"from": "SUM_1[1]",
+				"to": "SUM_2[3]"
 			},
 			{
 				"from": "INPUT_6[1]",
-				"to": "sum_3[2]"
+				"to": "SUM_3[2]"
 			},
 			{
 				"from": "INPUT_14[1]",
-				"to": "sum_3[1]"
+				"to": "SUM_3[1]"
 			},
 			{
-				"from": "sum_2[1]",
-				"to": "sum_3[3]"
+				"from": "SUM_2[1]",
+				"to": "SUM_3[3]"
 			},
 			{
 				"from": "INPUT_5[1]",
-				"to": "sum_4[2]"
+				"to": "SUM_4[2]"
 			},
 			{
-				"from": "sum_3[1]",
-				"to": "sum_4[3]"
+				"from": "SUM_3[1]",
+				"to": "SUM_4[3]"
 			},
 			{
 				"from": "INPUT_1[1]",
-				"to": "sum_8[2]"
+				"to": "SUM_8[2]"
 			},
 			{
 				"from": "INPUT_9[1]",
-				"to": "sum_8[1]"
+				"to": "SUM_8[1]"
 			},
 			{
 				"from": "INPUT_2[1]",
-				"to": "sum_7[2]"
+				"to": "SUM_7[2]"
 			},
 			{
 				"from": "INPUT_10[1]",
-				"to": "sum_7[1]"
+				"to": "SUM_7[1]"
 			},
 			{
 				"from": "INPUT_11[1]",
-				"to": "sum_6[1]"
+				"to": "SUM_6[1]"
 			},
 			{
 				"from": "INPUT_3[1]",
-				"to": "sum_6[2]"
+				"to": "SUM_6[2]"
 			},
 			{
 				"from": "INPUT_12[1]",
-				"to": "sum_5[1]"
+				"to": "SUM_5[1]"
 			},
 			{
 				"from": "INPUT_4[1]",
-				"to": "sum_5[2]"
+				"to": "SUM_5[2]"
 			},
 			{
-				"from": "sum_4[1]",
-				"to": "sum_5[3]"
+				"from": "SUM_4[1]",
+				"to": "SUM_5[3]"
 			},
 			{
-				"from": "sum_5[1]",
-				"to": "sum_6[3]"
+				"from": "SUM_5[1]",
+				"to": "SUM_6[3]"
 			},
 			{
-				"from": "sum_6[1]",
-				"to": "sum_7[3]"
+				"from": "SUM_6[1]",
+				"to": "SUM_7[3]"
 			},
 			{
-				"from": "sum_7[1]",
-				"to": "sum_8[3]"
+				"from": "SUM_7[1]",
+				"to": "SUM_8[3]"
 			},
 			{
 				"from": "INPUT_13[1]",
-				"to": "sum_4[1]"
+				"to": "SUM_4[1]"
 			},
 			{
-				"from": "sum_8[1]",
+				"from": "SUM_8[1]",
 				"to": "OUTPUT_1[1]"
 			},
 			{
-				"from": "sum_8[2]",
+				"from": "SUM_8[2]",
 				"to": "OUTPUT_2[1]"
 			},
 			{
-				"from": "sum_1[2]",
+				"from": "SUM_1[2]",
 				"to": "OUTPUT_9[1]"
 			},
 			{
-				"from": "sum_2[2]",
+				"from": "SUM_2[2]",
 				"to": "OUTPUT_8[1]"
 			},
 			{
-				"from": "sum_3[2]",
+				"from": "SUM_3[2]",
 				"to": "OUTPUT_7[1]"
 			},
 			{
-				"from": "sum_4[2]",
+				"from": "SUM_4[2]",
 				"to": "OUTPUT_6[1]"
 			},
 			{
-				"from": "sum_5[2]",
+				"from": "SUM_5[2]",
 				"to": "OUTPUT_5[1]"
 			},
 			{
-				"from": "sum_6[2]",
+				"from": "SUM_6[2]",
 				"to": "OUTPUT_4[1]"
 			},
 			{
-				"from": "sum_7[2]",
+				"from": "SUM_7[2]",
 				"to": "OUTPUT_3[1]"
 			}
 		],

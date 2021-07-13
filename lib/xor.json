@@ -1,5 +1,5 @@
 {
-	"xor": {
+	"XOR": {
 		"wires": [
 			{
 				"from": "INPUT_1[1]",

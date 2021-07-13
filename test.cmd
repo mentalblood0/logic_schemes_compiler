@@ -1,0 +1,1 @@
+@ python -m lsc --input lib\%1.json --target %1 --link lib --output example.c && gcc -O3 example.c && a.exe

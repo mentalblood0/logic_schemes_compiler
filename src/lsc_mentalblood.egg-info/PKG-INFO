@@ -1,3 +1,20 @@
+Metadata-Version: 2.1
+Name: lsc-mentalblood
+Version: 1.1
+Summary: Compile wires "from, to" list to working C code
+Home-page: https://github.com/MentalBlood/logic_schemes_compiler
+Author: mentalblood
+Author-email: neceporenkostepan@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/MentalBlood/logic_schemes_compiler/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 # 📦 LSC —  Logic Scheme to C compiler
 
 [![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
@@ -722,3 +739,5 @@ python -m lsc --input lib\sum_8.json --target sum_8 --link lib --output example.
 ```
 
 output code: [godbolt 📜](https://godbolt.org/z/q471hr8Ee) 
+
+
