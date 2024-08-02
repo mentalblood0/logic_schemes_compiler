@@ -1,1 +1,1 @@
-__all__ = ['compileLogicScheme']
+__all__ = ["compileLogicScheme"]
